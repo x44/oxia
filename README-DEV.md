@@ -90,7 +90,6 @@ pnpm test:create-oxia
 pnpm build:vscode
 pnpm watch:vscode
 pnpm package:vscode
-pnpm install:vscode
 pnpm local:vscode
 pnpm test:vscode
 ```
