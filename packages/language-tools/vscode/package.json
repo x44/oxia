@@ -1,6 +1,6 @@
 {
 	"name": "oxia-vscode",
-	"displayName": "Language Support for Oxia",
+	"displayName": "Oxia for VS Code",
 	"version": "0.0.5",
 	"author": "x44",
 	"license": "MIT",
