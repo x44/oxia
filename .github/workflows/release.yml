@@ -72,6 +72,6 @@ jobs:
 
       - name: Publish to VS Code Marketplace
         if: steps.changesets.outputs.hasChangesets == 'false' # Do not publish if only the Release Pull Request has been created
-        run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --packageManager pnpm --pat $VSCE_TOKEN
+        run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --no-dependencies --pat $VSCE_TOKEN
         env:
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
