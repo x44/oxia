@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+../dev-tools/project/create-test.ts $*
