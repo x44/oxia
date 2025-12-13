@@ -1,5 +1,12 @@
 # @test-projects/trash
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [0ff9e38]
+  - oxia@0.0.3
+
 ## 0.0.1
 
 ### Patch Changes
