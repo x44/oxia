@@ -7,6 +7,9 @@
 	"main": "./create-oxia.js",
 	"type": "module",
 	"provenance": true,
+	"publishConfig": {
+		"access": "public"
+	},
 	"files": [
 		"dist",
 		"dist/README.md"
