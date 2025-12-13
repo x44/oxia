@@ -1,0 +1,16 @@
+{
+	"name": "@test-projects/simple",
+	"version": "0.0.0",
+	"author": "x44",
+	"license": "MIT",
+	"private": true,
+	"description": "A simple project",
+	"scripts": {
+		"dev": "oxia dev",
+		"dev-ext": "pnpm --filter oxia run watch",
+		"build": "oxia build"
+	},
+	"dependencies": {
+		"oxia": "workspace:*"
+	}
+}

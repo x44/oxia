@@ -1,0 +1,4 @@
+import Component010 from "./Component010.oxia";
+export default function Component009() {
+return <div>009<Component010 /></div>
+}

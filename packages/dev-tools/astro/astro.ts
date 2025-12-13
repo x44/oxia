@@ -7,7 +7,8 @@ import { error, info } from "console";
 import type { Stats } from "fs";
 import { dirname } from "path";
 import { argv } from "process";
-import type { ResolvedServerOptions } from "../../oxia/src/config/types.ts";
+import { resolveOptions } from "../../oxia/src/build/options/options.ts";
+import type { Options } from "../../oxia/src/config/types.ts";
 import { formatMiddleware } from "../../oxia/src/server/middleware.ts";
 import { reloadDevServer, setDevServerClientReloadScriptDir, startDevServer } from "../../oxia/src/server/server.ts";
 import { absPath } from "../../oxia/src/util/fs.ts";
@@ -39,8 +40,17 @@ function parseArgs() {
 	ASTRO_PROJECT_DIST = `${ASTRO_PROJECT_ROOT}/dist`;
 }
 
-function createServerOptions() {
-	const options: ResolvedServerOptions = {
+function createOptions() {
+	const options: Options = {
+		main: {},
+		build: {},
+		paths: {},
+		server: {},
+	};
+
+	const resolvedOptions = resolveOptions("dev", options);
+
+	resolvedOptions.server = {
 		port: PORT,
 		host: "127.0.0.1",
 		routes: ASTRO_PROJECT_DIST,
@@ -49,7 +59,7 @@ function createServerOptions() {
 		route: "/",
 		code: true,
 	};
-	return options;
+	return resolvedOptions;
 }
 
 function runAstroBuild() {
@@ -66,7 +76,9 @@ function runAstroBuild() {
 async function startServer() {
 	const scriptDir = dirname(argv[1]);
 	setDevServerClientReloadScriptDir(absPath(scriptDir, "../../oxia/src/server"));
-	await startDevServer(serverOptions, false, formatMiddleware);
+
+	const options = createOptions();
+	await startDevServer(options, formatMiddleware);
 }
 
 function startWatching() {
@@ -116,7 +128,6 @@ async function onSourceFilesChanged(changedPaths: string[]) {
 }
 
 parseArgs();
-const serverOptions = createServerOptions();
 runAstroBuild();
 await startServer();
 startWatching();

@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "nodenext",
+		"lib": [
+			"ES2022",
+		],
+		"types": [
+			"node",
+		],
+		"skipLibCheck": true,
+		"useDefineForClassFields": true,
+		"moduleResolution": "nodenext",
+		"verbatimModuleSyntax": true,
+		"moduleDetection": "force",
+		"strict": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true
+	}
+}

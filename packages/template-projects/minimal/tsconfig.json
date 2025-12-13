@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "types": [
+      "oxia"
+    ],
+    "jsx": "react",
+    "noEmit": true
+  }
+}

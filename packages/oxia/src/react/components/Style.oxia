@@ -1,0 +1,38 @@
+import { existsSync } from "fs";
+import { dirname, isAbsolute } from "path";
+import { absPath, writeTextFile } from "../../util/fs.js";
+import { toResourceFileAndReference } from "../../util/resource.js";
+import { React } from "../react.js";
+import { processStyle } from "../util/style-processor.js";
+import { type StyleProps } from "./Style.js";
+
+export default function Style(props: StyleProps) {
+	const files = Array.isArray(props.src) ? props.src : [props.src];
+	// debug("Style() called, files:", files);
+
+	// Bundle the input css files to a single css code fragment
+	const cssCodes = files.map(file => {
+		let absFile = file;
+		if (!isAbsolute(absFile)) {
+			absFile = absPath(dirname(React.srcFileDir), file);
+			if (!existsSync(absFile)) {
+				absFile = absPath(React.srcSourceDir, file);
+			}
+		}
+		// debug("processing", absFile);
+		return processStyle(absFile);
+	});
+
+	const cssCode = cssCodes.join("\n");
+
+	// Write or embed the js code
+	if (props.mode === "ref") {
+		const {absDstFilePath, ref} = toResourceFileAndReference(React.dstRoutesDir, React.dstFileDir, props.dst, props.refType || "rel");
+		// debug("writing", absFile);
+		writeTextFile(absDstFilePath, cssCode);
+
+		return <link rel="stylesheet" href={`${ref}`}></link>
+	} else {
+		return `<style>${cssCode}</style>`
+	}
+}

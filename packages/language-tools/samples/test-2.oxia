@@ -1,0 +1,40 @@
+function rand() {
+	return Math.random() * 50;
+}
+
+export default function index() {
+	return (
+		<div>
+			<style>
+				div {
+					contentA: "{`${rand()}`}";
+					color: red;
+					padding: {`${rand()}px`};
+				}
+			</style>
+			<style>{`
+				div {
+					contentB: "${rand()}";
+					background: green;
+					margin: ${rand()}px;
+				}
+			`}</style>
+		</div>
+	)
+	<style>
+		div {
+			color: {`${rand()}`};
+			contentA: "{`${rand()}px`}";
+			color: blue;
+			padding: {`${rand()}px`};
+		}
+	</style>
+	<style>{`
+		div {
+		color: ${};
+			contentB: "${rand()}px";
+			background: orange;
+			margin: ${rand()}px;
+		}
+	`}</style>
+}

@@ -1,0 +1,46 @@
+import { existsSync } from "fs";
+import { dirname, isAbsolute } from "path";
+import { absPath, writeTextFile } from "../../util/fs.js";
+import { toResourceFileAndReference } from "../../util/resource.js";
+import { React } from "../react.js";
+import { processScript } from "../util/script-processor.js";
+import { type ScriptProps } from "./Script.js";
+
+export default function Script(props: ScriptProps) {
+	const files = Array.isArray(props.src) ? props.src : [props.src];
+	// debug("Script() called, files:", files);
+
+	// Bundle the input ts files to a single js code fragment
+	const jsCodes = files.map(file => {
+		let absFile = file;
+		if (!isAbsolute(absFile)) {
+			absFile = absPath(dirname(React.srcFileDir), file);
+			if (!existsSync(absFile)) {
+				absFile = absPath(React.srcSourceDir, file);
+			}
+		}
+		// debug("processing", absFile);
+		return processScript(absFile);
+	});
+
+	const jsCode = jsCodes.join("\n");
+
+	// Write or embed the js code
+	if (props.mode === "ref") {
+		const {absDstFilePath, ref} = toResourceFileAndReference(React.dstRoutesDir, React.dstFileDir, props.dst, props.refType || "rel");
+		// debug("writing", absDstFilePath);
+		writeTextFile(absDstFilePath, jsCode);
+
+		if (!props.type) {
+			return <script src={`${ref}`}></script>
+		} else {
+			return <script type={`${props.type}`} src={`${ref}`}></script>
+		}
+	} else {
+		if (!props.type) {
+			return <script>{jsCode}</script>
+		} else {
+			return <script type={`${props.type}`}>{jsCode}</script>
+		}
+	}
+}

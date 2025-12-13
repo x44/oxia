@@ -1,0 +1,107 @@
+import Component000 from "../components/Component000.oxia";
+import Component001 from "../components/Component001.oxia";
+import Component002 from "../components/Component002.oxia";
+import Component003 from "../components/Component003.oxia";
+import Component004 from "../components/Component004.oxia";
+import Component005 from "../components/Component005.oxia";
+import Component006 from "../components/Component006.oxia";
+import Component007 from "../components/Component007.oxia";
+import Component008 from "../components/Component008.oxia";
+import Component009 from "../components/Component009.oxia";
+import Component010 from "../components/Component010.oxia";
+import Component011 from "../components/Component011.oxia";
+import Component012 from "../components/Component012.oxia";
+import Component013 from "../components/Component013.oxia";
+import Component014 from "../components/Component014.oxia";
+import Component015 from "../components/Component015.oxia";
+import Component016 from "../components/Component016.oxia";
+import Component017 from "../components/Component017.oxia";
+import Component018 from "../components/Component018.oxia";
+import Component019 from "../components/Component019.oxia";
+import Component020 from "../components/Component020.oxia";
+import Component021 from "../components/Component021.oxia";
+import Component022 from "../components/Component022.oxia";
+import Component023 from "../components/Component023.oxia";
+import Component024 from "../components/Component024.oxia";
+import Component025 from "../components/Component025.oxia";
+import Component026 from "../components/Component026.oxia";
+import Component027 from "../components/Component027.oxia";
+import Component028 from "../components/Component028.oxia";
+import Component029 from "../components/Component029.oxia";
+import Component030 from "../components/Component030.oxia";
+import Component031 from "../components/Component031.oxia";
+import Component032 from "../components/Component032.oxia";
+import Component033 from "../components/Component033.oxia";
+import Component034 from "../components/Component034.oxia";
+import Component035 from "../components/Component035.oxia";
+import Component036 from "../components/Component036.oxia";
+import Component037 from "../components/Component037.oxia";
+import Component038 from "../components/Component038.oxia";
+import Component039 from "../components/Component039.oxia";
+import Component040 from "../components/Component040.oxia";
+import Component041 from "../components/Component041.oxia";
+import Component042 from "../components/Component042.oxia";
+import Component043 from "../components/Component043.oxia";
+import Component044 from "../components/Component044.oxia";
+import Component045 from "../components/Component045.oxia";
+import Component046 from "../components/Component046.oxia";
+import Component047 from "../components/Component047.oxia";
+import Component048 from "../components/Component048.oxia";
+import Component049 from "../components/Component049.oxia";
+import { justFunction } from "../just.js";
+
+export default function index() {
+  return <div>
+  {justFunction()}
+  <Component000 />
+  <Component001 />
+  <Component002 />
+  <Component003 />
+  <Component004 />
+  <Component005 />
+  <Component006 />
+  <Component007 />
+  <Component008 />
+  <Component009 />
+  <Component010 />
+  <Component011 />
+  <Component012 />
+  <Component013 />
+  <Component014 />
+  <Component015 />
+  <Component016 />
+  <Component017 />
+  <Component018 />
+  <Component019 />
+  <Component020 />
+  <Component021 />
+  <Component022 />
+  <Component023 />
+  <Component024 />
+  <Component025 />
+  <Component026 />
+  <Component027 />
+  <Component028 />
+  <Component029 />
+  <Component030 />
+  <Component031 />
+  <Component032 />
+  <Component033 />
+  <Component034 />
+  <Component035 />
+  <Component036 />
+  <Component037 />
+  <Component038 />
+  <Component039 />
+  <Component040 />
+  <Component041 />
+  <Component042 />
+  <Component043 />
+  <Component044 />
+  <Component045 />
+  <Component046 />
+  <Component047 />
+  <Component048 />
+  <Component049 />
+  </div>
+}

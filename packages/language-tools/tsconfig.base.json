@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "Node16",
+		"sourceMap": true,
+		"strict": true,
+		"moduleResolution": "Node16",
+		"esModuleInterop": true,
+		"lib": ["ES2022"],
+
+		// project references
+		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
+		"incremental": true,
+		"skipLibCheck": true,
+
+		"baseUrl": "./",
+		"paths": {
+			"@oxia/language-server": [
+				"language-server/src"
+			],
+		},
+	}
+}

@@ -1,0 +1,137 @@
+{
+	"name": "oxia-vscode",
+	"displayName": "Oxia Language Support",
+	"version": "0.0.1",
+	"author": "x44",
+	"license": "MIT",
+	"publisher": "x44",
+	"icon": "assets/icon.png",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/x44/oxia.git",
+		"directory": "packages/language-tools/vscode"
+	},
+	"engines": {
+		"vscode": "^1.107.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"activationEvents": [
+		"onLanguage:oxia"
+	],
+	"main": "./dist/client.js",
+	"contributes": {
+		"languages": [
+			{
+				"id": "oxia",
+				"extensions": [
+					".oxia"
+				],
+				"aliases": [
+					"Oxia",
+					"Oxia",
+					"oxia"
+				],
+				"configuration": "./language-configuration.json",
+				"icon": {
+					"light": "./assets/lang-icon-light.svg",
+					"dark": "./assets/lang-icon-dark.svg"
+				}
+			}
+		],
+		"grammars": [
+			{
+				"language": "oxia",
+				"scopeName": "source.tsx.oxia",
+				"path": "./syntaxes/oxia.tmLanguage.json",
+				"embeddedLanguages": {
+					"meta.embedded.block.css": "css",
+					"source.css": "css"
+				}
+			},
+			{
+				"scopeName": "style.injection.oxia",
+				"path": "./syntaxes/oxia-injection.tmLanguage.json",
+				"injectTo": [
+					"source.tsx.oxia"
+				]
+			}
+		],
+		"commands": [
+			{
+				"command": "oxia.commentLine",
+				"title": "Toggle Line Comment",
+				"category": "Oxia"
+			},
+			{
+				"command": "oxia.blockComment",
+				"title": "Toggle Block Comment",
+				"category": "Oxia"
+			},
+			{
+				"command": "oxia.addCommentLine",
+				"title": "Add Line Comment",
+				"category": "Oxia"
+			},
+			{
+				"command": "oxia.removeCommentLine",
+				"title": "Remove Line Comment",
+				"category": "Oxia"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "oxia.commentLine",
+				"key": "ctrl+/",
+				"mac": "cmd+/",
+				"when": "editorTextFocus && editorLangId == 'oxia'"
+			},
+			{
+				"command": "oxia.blockComment",
+				"key": "shift+alt+a",
+				"mac": "shift+alt+a",
+				"when": "editorTextFocus && editorLangId == 'oxia'"
+			},
+			{
+				"command": "oxia.addCommentLine",
+				"key": "ctrl+k ctrl+c",
+				"mac": "cmd+k cmd+c",
+				"when": "editorTextFocus && editorLangId == 'oxia'"
+			},
+			{
+				"command": "oxia.removeCommentLine",
+				"key": "ctrl+k ctrl+u",
+				"mac": "cmd+k cmd+u",
+				"when": "editorTextFocus && editorLangId == 'oxia'"
+			}
+		],
+		"configuration": {
+			"title": "Oxia",
+			"properties": {
+				"oxia.typescript.tsdk": {
+					"type": "string",
+					"default": "",
+					"description": "Path to TypeScript SDK"
+				}
+			}
+		}
+	},
+	"dependencies": {
+		"@volar/vscode": "~2.4.27",
+		"vscode-languageclient": "^9.0.1"
+	},
+	"devDependencies": {
+		"@types/node": "^25.0.1",
+		"@types/vscode": "^1.107.0",
+		"@volar/language-server": "^2.4.27",
+		"esbuild": "latest",
+		"typescript": "^5.9.3"
+	},
+	"scripts": {
+		"build": "node scripts/build.js -- --minify",
+		"watch": "node scripts/build.js -- --watch",
+		"package": "pnpm build && vsce package -o oxia.vsix --no-dependencies",
+		"local": "pnpm package && code --install-extension oxia.vsix"
+	}
+}

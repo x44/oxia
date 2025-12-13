@@ -1,0 +1,23 @@
+{
+	"name": "root",
+	"version": "0.0.0",
+	"author": "x44",
+	"private": true,
+	"scripts": {
+		"build:oxia": "cd packages/oxia && pnpm run build",
+		"local:oxia": "cd packages/oxia && pnpm run local",
+		"test:oxia": "cd packages/oxia && pnpm run test",
+		"build:create-oxia": "cd packages/create-oxia && pnpm run build",
+		"local:create-oxia": "cd packages/create-oxia && pnpm run local",
+		"test:create-oxia": "echo \"Error: no test specified\" && exit 1",
+		"build:vscode": "cd ./packages/language-tools/vscode && pnpm run build",
+		"watch:vscode": "cd ./packages/language-tools/vscode && pnpm run watch",
+		"package:vscode": "cd ./packages/language-tools/vscode && pnpm package",
+		"local:vscode": "cd ./packages/language-tools/vscode && pnpm local",
+		"test:vscode": "echo \"Error: no test specified\" && exit 1"
+	},
+	"packageManager": "pnpm@10.25.0",
+	"devDependencies": {
+		"@changesets/cli": "^2.29.8"
+	}
+}

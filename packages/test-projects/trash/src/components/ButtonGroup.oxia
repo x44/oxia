@@ -1,0 +1,17 @@
+export default function ButtonGroup() {
+	return <div><slot/></div>
+	<style>
+	div {
+		display: flex;
+		width: fit-content;
+		border: 2px solid blue;
+	}
+	</style>
+
+	<style slot>
+	button {
+		border: none;
+		border-radius: 0;
+	}
+	</style>
+}

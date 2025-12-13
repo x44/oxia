@@ -1,0 +1,9 @@
+{
+  "name": "Oxia",
+  "scopeName": "source.tsx.oxia",
+  "patterns": [
+    {
+      "include": "source.tsx"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+export default function index() {
+	return (
+		<abbr aria-busy></abbr>
+		<body style="background: #202020; color: #e0e0e0;">
+		<button onClick="console.log('HELLO')"></button>
+		<div>Hello, world!</div>
+		</body>
+	)
+}

@@ -1,0 +1,56 @@
+function rand() {
+	return Math.ceil(50 + Math.random() * 50);
+}
+
+function randomColor() {
+	return `rgb(${rand()},${rand()},${rand()})`;
+}
+
+function WithUnscopedStyle() {
+	return (
+		<div>
+			WithUnscopedStyle
+
+			<style>
+				div {
+					background: {`${randomColor()}`};
+					color: white;
+					padding: 16px;
+					position: relative;
+				}
+				div::after {
+					content: "{`Value ${rand()}`}";
+					position: absolute;
+					left: 256px;
+				}
+			</style>
+		</div>
+	)
+}
+
+function WithScopedStyle() {
+	return (
+		<div>WithScopedStyle</div>
+	)
+
+	<style>
+		div {
+			background: {`${randomColor()}`};
+			color: white;
+			padding: 16px;
+			position: relative;
+		}
+		div::after {
+			content: "{`Value ${rand()}`}";
+			position: absolute;
+			left: 256px;
+		}
+	</style>
+}
+
+export default function index() {
+	return (
+		<WithScopedStyle></WithScopedStyle>
+		<WithUnscopedStyle></WithUnscopedStyle>
+	)
+}

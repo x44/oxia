@@ -1,0 +1,27 @@
+{
+	"name": "create-oxia",
+	"version": "0.0.1",
+	"author": "x44",
+	"license": "MIT",
+	"description": "",
+	"main": "./create-oxia.js",
+	"type": "module",
+	"files": [
+		"dist",
+		"dist/README.md"
+	],
+	"bin": {
+		"create-oxia": "./create-oxia.js"
+	},
+	"scripts": {
+		"build": "bun ./scripts/build.ts",
+		"local": "pnpm run build && bun ../dev-tools/verdaccio/republish"
+	},
+	"devDependencies": {
+		"@types/node": "^25.0.1"
+	},
+	"dependencies": {
+		"chalk": "^5.6.2",
+		"sisteransi": "^1.0.5"
+	}
+}
