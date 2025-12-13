@@ -66,6 +66,10 @@ jobs:
         if: steps.changesets.outputs.published == 'true'
         run: pnpm run build:vscode
 
+      - name: Install vsce
+        if: steps.changesets.outputs.published == 'true'
+        run: npm install -g @vscode/vsce
+
       - name: Publish to VS Code Marketplace
         if: steps.changesets.outputs.published == 'true'
         run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --pat $VSCE_TOKEN
