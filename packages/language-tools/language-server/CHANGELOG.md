@@ -1,5 +1,11 @@
 # @oxia/language-server
 
+## 0.0.4
+
+### Patch Changes
+
+- 78ee5b3: Init
+
 ## 0.0.3
 
 ### Patch Changes
