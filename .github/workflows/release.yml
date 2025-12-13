@@ -62,14 +62,12 @@ jobs:
           # Using OIDC for npm authentication
           NPM_TOKEN: ''
 
-      - name: Exit if changesets only created the Release Pull Request
-        if: steps.changesets.outputs.published == 'false'
-        run: exit 0
-
       - name: Build vscode
+        if: steps.changesets.outputs.published == 'true'
         run: pnpm run build:vscode
 
       - name: Publish to VS Code Marketplace
+        if: steps.changesets.outputs.published == 'true'
         run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --pat $VSCE_TOKEN
         env:
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
