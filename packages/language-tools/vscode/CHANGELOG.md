@@ -1,5 +1,11 @@
 # oxia-vscode
 
+## 0.0.6
+
+### Patch Changes
+
+- 58f6216: Init
+
 ## 0.0.5
 
 ### Patch Changes
