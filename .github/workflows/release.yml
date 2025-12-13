@@ -21,31 +21,47 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.1
-        
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
-        
-      - name: Setup Node
-        uses: actions/setup-node@v6.1.0
-        with:
-          node-version: 25
-          cache: pnpm
-          
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2      
 
-      - name: Setup tsgo
-        run: npm i -g @typescript/native-preview
+      - name: Store old language-server and vscode version
+        id: old-vscode
+        run: echo "version=$(pnpm --filter=language-server exec pnpm pkg get version 2>/dev/null)/$(pnpm --filter=oxia-vscode exec pnpm pkg get version 2>/dev/null)" >> "$GITHUB_OUTPUT"
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Store new language-server and vscode version
+        id: new-vscode
+        run: echo "version=$(pnpm --filter=language-server exec pnpm pkg get version 2>/dev/null)/$(pnpm --filter=oxia-vscode exec pnpm pkg get version 2>/dev/null)" >> "$GITHUB_OUTPUT"
 
-      - name: Build create-oxia
-        run: pnpm run build:create-oxia
-        
-      - name: Build oxia
-        run: pnpm run build:oxia
-        
-      - name: Build vscode
-        run: pnpm run build:vscode
-        
+      - name: TestA
+        if: ${{ steps.old-vscode.version != steps.new-vscode.version }}
+        run: echo "VSCODE VERSION CHANGED"
+
+      - name: TestB
+        if: ${{ steps.old-vscode.version == steps.new-vscode.version }}
+        run: echo "VSCODE VERSION DID NOT CHANGE"
+
+      # - name: Setup Node
+      #   uses: actions/setup-node@v6.1.0
+      #   with:
+      #     node-version: 25
+      #     cache: pnpm
+
+      # - name: Setup Bun
+      #   uses: oven-sh/setup-bun@v2
+
+      # - name: Setup tsgo
+      #   run: npm i -g @typescript/native-preview
+
+      # - name: Install dependencies
+      #   run: pnpm install
+
+      # - name: Build create-oxia
+      #   run: pnpm run build:create-oxia
+
+      # - name: Build oxia
+      #   run: pnpm run build:oxia
+
+      # - name: Build vscode
+      #   run: pnpm run build:vscode
+
