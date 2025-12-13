@@ -5,6 +5,7 @@
 	"license": "MIT",
 	"description": "Development tools",
 	"type": "module",
+	"private": true,
 	"scripts": {},
 	"devDependencies": {
 		"@types/node": "^25.0.1",

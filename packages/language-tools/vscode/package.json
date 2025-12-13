@@ -5,6 +5,7 @@
 	"author": "x44",
 	"license": "MIT",
 	"publisher": "x44",
+	"private": true,
 	"icon": "assets/icon.png",
 	"repository": {
 		"type": "git",
