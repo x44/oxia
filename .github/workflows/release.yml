@@ -14,8 +14,8 @@ env:
   FORCE_COLOR: true
 
 jobs:
-  publish:
-    name: Publish
+  release:
+    name: Release
     if: ${{github.repository_owner == 'x44'}} && (github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
@@ -25,43 +25,42 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
 
-      - name: Store old language-server and vscode version
-        id: old-vscode
-        run: echo "version=$(pnpm --filter=language-server exec pnpm pkg get version 2>/dev/null)/$(pnpm --filter=oxia-vscode exec pnpm pkg get version 2>/dev/null)" >> "$GITHUB_OUTPUT"
+      - name: Setup Node
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: 25
+          cache: pnpm
 
-      - name: Store new language-server and vscode version
-        id: new-vscode
-        run: echo "version=$(pnpm --filter=language-server exec pnpm pkg get version 2>/dev/null)/$(pnpm --filter=oxia-vscode exec pnpm pkg get version 2>/dev/null)" >> "$GITHUB_OUTPUT"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: TestA
-        if: ${{ steps.old-vscode.version != steps.new-vscode.version }}
-        run: echo "VSCODE VERSION CHANGED"
+      - name: Setup tsgo
+        run: npm i -g @typescript/native-preview
 
-      - name: TestB
-        if: ${{ steps.old-vscode.version == steps.new-vscode.version }}
-        run: echo "VSCODE VERSION DID NOT CHANGE"
+      - name: Install dependencies
+        run: pnpm install
 
-      # - name: Setup Node
-      #   uses: actions/setup-node@v6.1.0
-      #   with:
-      #     node-version: 25
-      #     cache: pnpm
+      - name: Build create-oxia
+        run: pnpm run build:create-oxia
 
-      # - name: Setup Bun
-      #   uses: oven-sh/setup-bun@v2
+      - name: Build oxia
+        run: pnpm run build:oxia
 
-      # - name: Setup tsgo
-      #   run: npm i -g @typescript/native-preview
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Using OIDC for npm authentication
+          NPM_TOKEN: ''
 
-      # - name: Install dependencies
-      #   run: pnpm install
+      - name: Exit if only created Release Pull Request
+        if: steps.changesets.outputs.published == 'false'
+        run: exit 0
 
-      # - name: Build create-oxia
-      #   run: pnpm run build:create-oxia
+      - name: Build vscode
+        run: pnpm run build:vscode
 
-      # - name: Build oxia
-      #   run: pnpm run build:oxia
-
-      # - name: Build vscode
-      #   run: pnpm run build:vscode
-
+      - name: Publish to VS Code Marketplace
+        run: echo "TODO vsce publish"
+#        run: vsce publish --skip-duplicate
