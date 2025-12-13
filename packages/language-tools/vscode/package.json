@@ -1,7 +1,7 @@
 {
 	"name": "oxia-vscode",
 	"displayName": "Language Support for Oxia",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"author": "x44",
 	"license": "MIT",
 	"publisher": "x44",
