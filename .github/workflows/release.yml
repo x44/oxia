@@ -69,4 +69,4 @@ jobs:
       - name: Publish to VS Code Marketplace
         run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --pat $VSCE_TOKEN
         env:
-          VSCE_TOKEN: ${{ secrects.VSCE_TOKEN }}
+          VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
