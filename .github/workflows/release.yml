@@ -63,15 +63,15 @@ jobs:
           NPM_TOKEN: ''
 
       - name: Build vscode
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.changesets.outputs.hasChangesets == 'false' # Do not publish if only the Release Pull Request has been created
         run: pnpm run build:vscode
 
       - name: Install vsce
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.changesets.outputs.hasChangesets == 'false' # Do not publish if only the Release Pull Request has been created
         run: npm install -g @vscode/vsce
 
       - name: Publish to VS Code Marketplace
-        if: steps.changesets.outputs.published == 'true'
-        run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --pat $VSCE_TOKEN
+        if: steps.changesets.outputs.hasChangesets == 'false' # Do not publish if only the Release Pull Request has been created
+        run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --packageManager pnpm --pat $VSCE_TOKEN
         env:
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
