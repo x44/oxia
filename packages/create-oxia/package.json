@@ -7,6 +7,10 @@
 	"main": "./create-oxia.js",
 	"type": "module",
 	"provenance": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/x44/oxia.git"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
