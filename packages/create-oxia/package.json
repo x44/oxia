@@ -6,6 +6,7 @@
 	"description": "",
 	"main": "./create-oxia.js",
 	"type": "module",
+	"provenance": true,
 	"files": [
 		"dist",
 		"dist/README.md"
