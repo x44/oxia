@@ -49,12 +49,17 @@ jobs:
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
+        with:
+          version: pnpm run version
+          publish: pnpm exec changeset publish
+          commit: "[ci] release"
+          title: "[ci] release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Using OIDC for npm authentication
           NPM_TOKEN: ''
 
-      - name: Exit if only created Release Pull Request
+      - name: Exit if changesets only created the Release Pull Request
         if: steps.changesets.outputs.published == 'false'
         run: exit 0
 
@@ -62,5 +67,5 @@ jobs:
         run: pnpm run build:vscode
 
       - name: Publish to VS Code Marketplace
-        run: echo "TODO vsce publish"
-#        run: vsce publish --skip-duplicate
+        run: cd packages/language-tools/vscode && vsce publish --skip-duplicate --pat $VSCE_TOKEN
+        env: VSCE_TOKEN: ${{ secrects.VSCE_TOKEN }}
