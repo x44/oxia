@@ -3,15 +3,17 @@
 	"version": "0.0.4",
 	"author": "x44",
 	"license": "MIT",
-	"description": "",
+	"description": "Oxia is a static website build tool.",
 	"main": "./oxia.js",
 	"types": "./dist/index.d.ts",
 	"type": "module",
 	"provenance": true,
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/x44/oxia.git"
+		"url": "git+https://github.com/x44/oxia.git",
+		"directory": "packages/oxia"
 	},
+	"bugs": "https://github.com/x44/oxia/issues",
 	"publishConfig": {
 		"access": "public"
 	},

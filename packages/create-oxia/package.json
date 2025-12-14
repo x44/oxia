@@ -3,14 +3,16 @@
 	"version": "0.0.4",
 	"author": "x44",
 	"license": "MIT",
-	"description": "",
+	"description": "Scaffolding for Oxia projects.",
 	"main": "./create-oxia.js",
 	"type": "module",
 	"provenance": true,
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/x44/oxia.git"
+		"url": "git+https://github.com/x44/oxia.git",
+		"directory": "packages/create-oxia"
 	},
+	"bugs": "https://github.com/x44/oxia/issues",
 	"publishConfig": {
 		"access": "public"
 	},

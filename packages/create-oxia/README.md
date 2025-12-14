@@ -1,9 +1,7 @@
-<p>
-	<img src="../../.github/assets/logo.png" alt="Oxia"/>
-	<span style="font-weight:bold;font-size:1.25rem;">Oxia</span> - a static website build tool.
-</p>
+# create-oxia
 
 ## Scaffolding for Oxia projects
+
 With npm
 ```bash
 npm create oxia@latest

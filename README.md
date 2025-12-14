@@ -1,6 +1,8 @@
-<p>
-	<img src=".github/assets/logo.png" alt="Oxia"/>
-	<span style="font-weight:bold;font-size:1.25rem;">Oxia</span> - a static website build tool.
+<p align="center">
+	<img src=".github/assets/banner.png" alt="Oxia"/>
+	<br/>
+	<span>Oxia is a static website build tool.</span>
+	<br/><br/>
 </p>
 
 ## Install
