@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.5
+
+### Patch Changes
+
+- 220ed0b: Updated images
+
 ## 0.0.4
 
 ### Patch Changes

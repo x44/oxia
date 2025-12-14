@@ -1,5 +1,11 @@
 # @oxia/language-server
 
+## 0.0.7
+
+### Patch Changes
+
+- 220ed0b: Updated images
+
 ## 0.0.6
 
 ### Patch Changes
