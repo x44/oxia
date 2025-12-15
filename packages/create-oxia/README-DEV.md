@@ -16,3 +16,15 @@ Run tests:
 ```
 pnpm test
 ```
+
+## Use the locally published package
+Set env vars for npm, pnpm and yarn:
+
+Windows
+```
+packages\create-oxia\dev\env-local.cmd
+```
+Linux & macOS
+```
+source packages/create-oxia/dev/env-local
+```

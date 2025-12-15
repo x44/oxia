@@ -17,7 +17,6 @@ type Settings = {
 	templateDir: string;
 	templatesDir: string;
 	packageManager: string;
-	packageRegistry: string;
 	installDependencies: boolean;
 	oxiaVersion: string;
 }
@@ -83,15 +82,9 @@ function getPackageManager() {
 	return "npm";
 }
 
-function getPackageRegistry() {
-	let registry = process.env.npm_config_registry;
-	if (!registry) registry = "http://localhost:4873";
-	return registry;
-}
-
-function getPackageVersion(packageRegistry: string, packageName: string) {
+function getPackageVersion(packageName: string) {
 	try {
-		const proc = spawnSync(`npm --registry ${packageRegistry} view ${packageName} version`, { shell: true });
+		const proc = spawnSync(`npm view ${packageName} version`, { shell: true });
 		if (proc.error) {
 			errorExit(`${proc.error}`);
 		}
@@ -111,7 +104,6 @@ function createSettings() {
 		templateDir: "",
 		templatesDir: getTemplatesDir(),
 		packageManager: getPackageManager(),
-		packageRegistry: getPackageRegistry(),
 		installDependencies: true,
 		oxiaVersion: "",
 	}
@@ -391,15 +383,9 @@ function copyDir(srcDir: string, dstDir: string) {
 function installDependencies(settings: Settings, task: Task) {
 	task.state = "running";
 
-	const env: NodeJS.ProcessEnv = {
-		"NPM_CONFIG_REGISTRY": settings.packageRegistry,
-		"YARN_REGISTRY": settings.packageRegistry,
-		"YARN_NPM_REGISTRY_SERVER": settings.packageRegistry,
-	};
-
 	let cmd = `${settings.packageManager} install`;
 
-	const proc = spawn(cmd, { shell: true, cwd: settings.projectDir, env: env });
+	const proc = spawn(cmd, { shell: true, cwd: settings.projectDir });
 
 	addProcess(proc);
 
@@ -435,7 +421,7 @@ async function create(settings: Settings) {
 	const taskWidget = new TaskWidget(term, { title: "Progress", alwaysActive: true, tasks: tasks });
 	const promise = term.setWidget(taskWidget);
 
-	settings.oxiaVersion = getPackageVersion(settings.packageRegistry, "oxia");
+	settings.oxiaVersion = getPackageVersion("oxia");
 
 	initProject(settings, initTask);
 	copyTemplate(settings, copyTask);
