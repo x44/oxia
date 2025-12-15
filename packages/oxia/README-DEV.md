@@ -12,6 +12,9 @@ Run tests:
 pnpm test
 ```
 
+## Use the locally published package
+See [dev-tools](../dev-tools/README-DEV.md#verdaccio)
+
 ## Scripts used by other packages
 The `watch` script runs oxia in self-watch mode, triggering a reload in the invoking project when the source code in the oxia package changes.
 

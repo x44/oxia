@@ -48,3 +48,15 @@ Run with:
 ```bash
 ./packages/dev-tools/astro/astro.ts <astro-project-dir> [-port n]
 ```
+
+## verdaccio
+To install from the local verdaccio npm registry set env vars for npm, pnpm and yarn with:
+
+Windows
+```
+packages\dev-tools\verdaccio\env.cmd
+```
+Linux & macOS
+```
+source packages/dev-tools/verdaccio/env
+```
