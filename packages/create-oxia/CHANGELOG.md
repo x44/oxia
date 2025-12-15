@@ -1,5 +1,11 @@
 # create-oxia
 
+## 0.0.5
+
+### Patch Changes
+
+- 062cced: Fixed create-oxia
+
 ## 0.0.4
 
 ### Patch Changes
