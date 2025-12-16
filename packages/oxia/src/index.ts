@@ -3,7 +3,7 @@ import * as path from "path";
 import { argv } from "process";
 import { MainLoader } from "./loader/MainLoader.js";
 
-const d = path.dirname(argv[1]);
+const d = path.dirname(fs.realpathSync(argv[1]));
 const dir = fs.existsSync(path.join(d, "dist")) ? path.join(d, "dist") : d;
 
 const index = "file://" + (dir.startsWith("/") ? "" : "/") + path.join(dir, "cli", "index.ts");

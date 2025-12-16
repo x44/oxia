@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { spawnSync } from "child_process";
 import chokidar from "chokidar";
 import { error, info } from "console";
-import type { Stats } from "fs";
+import { realpathSync, type Stats } from "fs";
 import { dirname } from "path";
 import { argv } from "process";
 import { resolveOptions } from "../../oxia/src/build/options/options.ts";
@@ -74,7 +74,7 @@ function runAstroBuild() {
 }
 
 async function startServer() {
-	const scriptDir = dirname(argv[1]);
+	const scriptDir = dirname(realpathSync(argv[1]));
 	setDevServerClientReloadScriptDir(absPath(scriptDir, "../../oxia/src/server"));
 
 	const options = createOptions();

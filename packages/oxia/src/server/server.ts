@@ -2,7 +2,7 @@ import chalk from "chalk";
 import express, { type Express, type Request } from "express";
 import type { ParamsDictionary } from "express-serve-static-core";
 import type { Server } from "http";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { dirname, extname, join } from "node:path";
 import { argv } from "node:process";
 import open from "open";
@@ -100,7 +100,7 @@ const contentTypeMap = new Map<string, string>([
 	[".7z", "application/x-7z-compressed"],
 ]);
 
-let oxiaDir = dirname(argv[1]);
+let oxiaDir = dirname(realpathSync(argv[1]));
 oxiaDir = oxiaDir.includes("node_modules") ? `${oxiaDir}/dist` : `${oxiaDir}`;
 let clientReloadScriptPath = absPath(oxiaDir, "server", "client-reload.js");
 let clientReloadScriptCode: string | undefined = undefined;

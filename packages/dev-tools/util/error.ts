@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { realpathSync } from "fs";
 import { basename } from "path";
 import { argv } from "process";
 
@@ -6,7 +7,7 @@ export function errorArgs(args: string[], msg: string) {
 	console.log();
 	console.log(chalk.red(msg));
 	console.log();
-	console.log([basename(argv[1]), ...args].join(" "));
+	console.log([basename(realpathSync(argv[1])), ...args].join(" "));
 	process.exit(1);
 }
 

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { ChildProcessWithoutNullStreams, spawn, spawnSync } from "child_process";
-import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from "fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, realpathSync, statSync } from "fs";
 import { platform } from "os";
 import { basename, dirname } from "path";
 import { argv } from "process";
@@ -46,7 +46,7 @@ function errorExit(msg: string) {
 }
 
 function getTemplatesDir() {
-	return absPath(dirname(argv[1]), "dist", "templates");
+	return absPath(dirname(realpathSync(argv[1])), "dist", "templates");
 }
 
 function getTemplateMetas() {

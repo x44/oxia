@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import chokidar from "chokidar";
-import { existsSync, readdirSync, readFileSync, Stats } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, Stats } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { clearTimeout, setTimeout } from "node:timers";
 import type { MainCommand, ResolvedOptions } from "../config/types.js";
@@ -313,7 +313,7 @@ async function init(cmd: MainCommand) {
 export default async function main(cmd: MainCommand) {
 	let version = "";
 	try {
-		version = JSON.parse(readFileSync(join(dirname(process.argv[1]), "package.json"), "utf8")).version;
+		version = JSON.parse(readFileSync(join(dirname(realpathSync(process.argv[1])), "package.json"), "utf8")).version;
 	} catch (error) {
 		console.error(error);
 	}

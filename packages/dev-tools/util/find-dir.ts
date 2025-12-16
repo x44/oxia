@@ -1,9 +1,9 @@
-import { existsSync } from "fs";
+import { existsSync, realpathSync } from "fs";
 import { dirname, join } from "path";
 import { argv } from "process";
 
 export function findParentDir(wantedDir: string) {
-	let dir = dirname(argv[1]);
+	let dir = dirname(realpathSync(argv[1]));
 	let sanity = 0;
 	while (true) {
 		const theDir = join(dir, wantedDir);
