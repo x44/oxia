@@ -17,5 +17,5 @@ Run tests:
 pnpm test
 ```
 
-## Use the locally published package
+## Using the locally published package
 See [dev-tools](../dev-tools/README-DEV.md#verdaccio)
