@@ -8,6 +8,10 @@
 	"publisher": "x44",
 	"private": true,
 	"icon": "assets/icon.png",
+	"galleryBanner": {
+		"color": "#000010",
+		"theme": "dark"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/x44/oxia.git",
@@ -20,7 +24,8 @@
 		"Programming Languages"
 	],
 	"activationEvents": [
-		"onLanguage:oxia"
+		"onLanguage:oxia",
+		"workspaceContains:oxia.config.*"
 	],
 	"main": "./dist/client.js",
 	"contributes": {
