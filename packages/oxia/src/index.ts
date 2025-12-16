@@ -6,7 +6,7 @@ import { MainLoader } from "./loader/MainLoader.js";
 const d = path.dirname(argv[1]);
 const dir = fs.existsSync(path.join(d, "dist")) ? path.join(d, "dist") : d;
 
-const index = "file:///" + path.join(dir, "cli", "index.ts");
+const index = "file://" + (dir.startsWith("/") ? "" : "/") + path.join(dir, "cli", "index.ts");
 
 const loader = new MainLoader();
 

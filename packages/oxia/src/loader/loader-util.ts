@@ -1,6 +1,9 @@
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as ts from "typescript";
+
+const isWin = os.platform() === "win32";
 
 export function resolveSpecifier(specifier: string, parentUrl: string | undefined) {
 	let absFile = specifier2file(specifier);
@@ -29,7 +32,7 @@ function checkFileWithExtension(absFile: string, newExt: string, absParentFile: 
 }
 
 export function toUrl(absFile: string, timestamp: number | undefined) {
-	const absUrl = `file:///${absFile.replaceAll("\\", "/")}`;
+	const absUrl = `file://${absFile.startsWith("/") ? "" : "/"}${absFile.replaceAll("\\", "/")}`;
 
 	if (timestamp !== undefined) {
 		return appendTimestamp(absUrl, timestamp);
@@ -53,9 +56,8 @@ export function specifier2file(specifier: string) {
 }
 
 export function url2file(url: string) {
-	// Remove protocol and optional timestamp
 	const t = url.lastIndexOf("?t=");
-	return url.substring("file:///".length, t === -1 ? url.length : t);
+	return url.substring("file://".length + (isWin ? 1 : 0), t === -1 ? url.length : t);
 }
 
 export function withExtension(urlOrPath: string, extension: string) {
