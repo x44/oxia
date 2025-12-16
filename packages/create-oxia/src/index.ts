@@ -58,7 +58,7 @@ function getTemplateMetas() {
 		{
 			id: "empty",
 			name: "Empty",
-			description: "Creates an empty project",
+			description: "Creates a nearly empty project",
 		},
 		...templateDirs.map(templateDir => readTemplateMeta(absPath(templatesDir, templateDir)))
 	];
@@ -361,7 +361,7 @@ function copyEmptyTemplate(settings: Settings) {
 
 	const indexContent = [
 		`export default function index() {`,
-		`\treturn <div>Hello, world!</div>`,
+		`\treturn <h1>Oxia</h1>`,
 		`}`,
 		``,
 	];
