@@ -1,5 +1,11 @@
 # create-oxia
 
+## 0.0.6
+
+### Patch Changes
+
+- 4f6be6d: Fixed all file not found errors
+
 ## 0.0.5
 
 ### Patch Changes
