@@ -1,5 +1,11 @@
 # oxia-vscode
 
+## 0.0.8
+
+### Patch Changes
+
+- 4f6be6d: Updated images and icons
+
 ## 0.0.7
 
 ### Patch Changes
