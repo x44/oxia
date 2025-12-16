@@ -59,7 +59,7 @@ interface IntrinsicHTMLElements {
 	html: HtmlHTMLAttributes<HTMLHtmlElement>;
 	i: HTMLAttributes<HTMLElement>;
 	iframe: IframeHTMLAttributes<HTMLIFrameElement>;
-	img: HTMLAttributes<HTMLImageElement>;
+	img: ImgHTMLAttributes<HTMLImageElement>;
 	input: HTMLAttributes<HTMLInputElement>;
 	ins: InsHTMLAttributes<HTMLModElement>;
 	kbd: HTMLAttributes<HTMLElement>;
@@ -95,7 +95,7 @@ interface IntrinsicHTMLElements {
 	script: ScriptHTMLAttributes<HTMLScriptElement>;
 	search: HTMLAttributes<HTMLElement>;
 	section: HTMLAttributes<HTMLElement>;
-	select: HTMLAttributes<HTMLSelectElement>;
+	select: SelectHTMLAttributes<HTMLSelectElement>;
 	slot: SlotHTMLAttributes<HTMLSlotElement>;
 	small: HTMLAttributes<HTMLElement>;
 	source: SourceHTMLAttributes<HTMLSourceElement>;
@@ -1376,10 +1376,6 @@ interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
 	media?: string | undefined;
 	scoped?: boolean | undefined;
 	type?: string | undefined;
-
-	// React props
-	href?: string | undefined;
-	precedence?: string | undefined;
 }
 
 interface TableHTMLAttributes<T> extends HTMLAttributes<T> {
