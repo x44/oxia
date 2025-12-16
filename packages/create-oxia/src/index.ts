@@ -324,11 +324,23 @@ function createOxiaConfigTs(settings: Settings) {
 	writeTextFile(file, content.join("\n"));
 }
 
+function createExtensionsJson(settings: Settings) {
+	const file = absPath(settings.projectDir, ".vscode", "extensions.json");
+
+	const content = {
+		recommendations: ["x44.oxia-vscode"],
+		unwantedRecommendations: []
+	};
+
+	writeTextFile(file, JSON.stringify(content, null, "  "));
+}
+
 function initProject(settings: Settings, task: Task) {
 	task.state = "running";
 	createPackageJson(settings);
 	createTsConfigJson(settings);
 	createOxiaConfigTs(settings);
+	createExtensionsJson(settings);
 	task.state = "success";
 }
 
