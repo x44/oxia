@@ -43,7 +43,7 @@ function printHelpAndExit(cmd: MainCommand) {
 	Log.log(`oxia ${cmd} [OPTIONS] GlobalPropKey=value ...`);
 
 	Log.log("\nOPTIONS\n");
-	Log.log("-cfg                            Config module or file. Default is 'oxia.config.ts' or 'oxia.json'");
+	Log.log("-cfg                            Config module or file. Default is 'oxia.config.ts' or 'oxia.config.json'");
 	Log.log("-watch                          Enable file watching. Default is 'true' in dev mode and 'false' in build mode.");
 	Log.log("-rebuild-all                    Always rebuild all files.");
 	Log.log("-debug                          Enable debug messages.");
@@ -197,7 +197,7 @@ async function readConfig(options: Options) {
 		// Default cfg file. Ignore if not exists.
 		cfgFile = absPath("oxia.config.ts");
 		if (!existsSync(cfgFile)) {
-			cfgFile = absPath("oxia.json");
+			cfgFile = absPath("oxia.config.json");
 			if (!existsSync(cfgFile)) {
 				cfgFile = "";
 			}
