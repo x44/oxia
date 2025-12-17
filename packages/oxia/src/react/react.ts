@@ -167,10 +167,16 @@ export class React {
 		//     </MyElement>
 		// </div>
 
+		children = this.flatten(children);
+
 		element.addChildren(children);
 
 		React.root = element;
 		return element;
+	}
+
+	private static flatten(a: (string | Element)[]): (string | Element)[] {
+		return a.flatMap((v) => Array.isArray(v) ? this.flatten(v) : v);
 	}
 
 	private static assignComponentFunction(element: Element, func: (props: any) => Element, functionInfo: FunctionInfo) {
