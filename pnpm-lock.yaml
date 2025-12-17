@@ -183,6 +183,12 @@ importers:
         specifier: workspace:*
         version: link:../../oxia
 
+  packages/test-projects/global-style:
+    dependencies:
+      oxia:
+        specifier: workspace:*
+        version: link:../../oxia
+
   packages/test-projects/inline-style:
     dependencies:
       oxia:
