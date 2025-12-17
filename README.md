@@ -298,6 +298,16 @@ function Parent() {
 ```
 
 
+## Global Styles
+Use the `is:global` attribute to create global styles. Note that this only applies to styles at the module level - function level styles with `is:global` are silently ignored.
+
+```tsx
+<style is:global>
+...
+<style>
+```
+
+
 ## Styling Slotted Content
 In some cases, it may be useful to change the style of a component depending on the DOM hierarchy. For example, buttons with rounded edges may not look appealing when added to a button group where the buttons are arranged side by side. In this case, it would be nice if the button group had a way to style it's content:
 

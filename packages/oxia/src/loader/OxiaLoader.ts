@@ -16,6 +16,8 @@ export class OxiaLoader {
 
 	private dependencyGraph = new DependencyGraph();
 
+	private oxiaFileResolvedListener?: (absFile: string) => void;
+
 	constructor(memFs: MemFs) {
 		OxiaLoader.instance = this;
 		this.memFs = memFs;
@@ -52,6 +54,10 @@ export class OxiaLoader {
 		OxiaLoader.instance.dependencyGraph.invalidate(changedFiles, OxiaLoader.instance.timestamp);
 	}
 
+	static setOxiaFileResolvedListener(oxiaFileResolvedListener: ((absFile: string) => void) | undefined) {
+		OxiaLoader.instance.oxiaFileResolvedListener = oxiaFileResolvedListener;
+	}
+
 	private resolve(specifier: string, context: ResolveHookContext, nextResolve: (specifier: string, context?: Partial<ResolveHookContext>) => ResolveFnOutput) {
 		// console.log("OxiaLoader: resolving:", specifier, context.parentURL);
 		const originalSpecifier = specifier;
@@ -78,6 +84,11 @@ export class OxiaLoader {
 			}
 
 			if (absFile.endsWith(".oxia")) {
+
+				if (this.oxiaFileResolvedListener) {
+					this.oxiaFileResolvedListener(absFile);
+				}
+
 				const absUrl = toUrl(absFile, timestamp);
 				// console.log("OxiaLoader: resolved:", absUrl);
 

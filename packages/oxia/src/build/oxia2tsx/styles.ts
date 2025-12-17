@@ -1,7 +1,7 @@
 import { getOrCreateMapEntry } from "../../util/map.js";
 import { blankCommentsAndStrings, findCharBwd, findCharFwd, whitespaceOnly } from "../../util/string.js";
 import { uuid } from "../../util/uuid.js";
-import { createPreprocessedFunctionSlotStyle, createPreprocessedFunctionStyle, createPreprocessedModuleStyle } from "./preprocess-registry.js";
+import { createPreprocessedFunctionSlotStyle, createPreprocessedFunctionStyle, createPreprocessedGlobalStyle, createPreprocessedModuleStyle } from "./preprocess-registry.js";
 import { STYLE_ID_END_TAG, STYLE_ID_START_TAG, type CombinedStyleBlock, type FunctionBlock, type StyleBlock, type StyleTsBlock } from "./types.js";
 
 export function extractStyleBlocks(srcCode: string): StyleBlock[] {
@@ -33,6 +33,8 @@ export function extractStyleBlocks(srcCode: string): StyleBlock[] {
 
 		const fixedId = attributes.get("data-oxia-sid");
 
+		const global = attributes.has("is:global");
+
 		let slotName = attributes.get("slot");
 		if (slotName !== undefined) {
 			if (slotName === "") {
@@ -59,6 +61,7 @@ export function extractStyleBlocks(srcCode: string): StyleBlock[] {
 			attributes,
 
 			inline: false,
+			global,
 			slotName,
 
 			tsBlocks: [],
@@ -262,6 +265,7 @@ export function hideStyleBlocks(srcCode: string, styleBlocks: StyleBlock[]) {
  */
 export function processStyleBlocks(srcFilePath: string, styleBlocks: StyleBlock[], functionBlocks: FunctionBlock[]) {
 
+	const globalStyleBlocks: StyleBlock[] = [];
 	const moduleStyleBlocks: StyleBlock[] = [];
 	const functionStyleBlocksMap = new Map<FunctionBlock, StyleBlock[]>();
 	const functionSlotStyleBlocksMap = new Map<FunctionBlock, StyleBlock[]>();
@@ -293,6 +297,9 @@ export function processStyleBlocks(srcFilePath: string, styleBlocks: StyleBlock[
 			}
 		}
 
+		if (!styleBlock.inline && styleBlock.global) {
+			globalStyleBlocks.push(styleBlock);
+		} else
 		if (!styleBlock.inline) {
 			if (owningFunctionBlock) {
 
@@ -312,11 +319,16 @@ export function processStyleBlocks(srcFilePath: string, styleBlocks: StyleBlock[
 		}
 	}
 
+	// Merge multiple global styles into one
+	const globalStyleBlock = combineStyleBlocks(globalStyleBlocks);
+	if (globalStyleBlock) {
+		createPreprocessedGlobalStyle(srcFilePath, globalStyleBlock);
+	}
+
 	// Merge multiple module-level styles into one
 	const moduleStyleBlock = combineStyleBlocks(moduleStyleBlocks);
 	if (moduleStyleBlock) {
 		createPreprocessedModuleStyle(srcFilePath, moduleStyleBlock);
-
 	}
 
 	// Merge multiple function-level styles into one (per function)
@@ -369,6 +381,9 @@ function combineStyleBlocks(styleBlocks: StyleBlock[]): CombinedStyleBlock | und
 export function styleBlockToSourceCode(srcCode: string, styleBlock: StyleBlock) {
 	if (styleBlock.inline) {
 		return inlineStyleBlockToSourceCode(srcCode, styleBlock);
+	} else
+	if (styleBlock.global) {
+		return globalStyleBlockToSourceCode(srcCode, styleBlock);
 	} else {
 		return scopedStyleBlockToSourceCode(srcCode, styleBlock);
 	}
@@ -390,6 +405,13 @@ function inlineStyleBlockToSourceCode(srcCode: string, styleBlock: StyleBlock) {
 		// Wrap the content in {`...`} and return <style>{`...`}</style>
 		return `<style>{\`${content}\`}</style>`;
 	}
+}
+
+function globalStyleBlockToSourceCode(srcCode: string, styleBlock: StyleBlock) {
+	// Return the style ID tag and new lines
+	const nNewLines = countNewLines(srcCode, styleBlock.pos, styleBlock.end);
+	const styleId = styleBlock.styleId;
+	return `/*${STYLE_ID_START_TAG}${styleId}${STYLE_ID_END_TAG}${"\n".repeat(nNewLines)}*/`;
 }
 
 function scopedStyleBlockToSourceCode(srcCode: string, styleBlock: StyleBlock) {

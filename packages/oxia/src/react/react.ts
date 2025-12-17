@@ -212,7 +212,8 @@ export class React {
 			module: {
 				srcFilePath: "builtin",
 				rootFunctions: [],
-				rootStyles: [],
+				rootScopedStyles: [],
+				globalStyle: undefined,
 			}
 		};
 		return functionInfo;

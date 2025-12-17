@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { type FunctionInfo, type SlotStyleInfo, type StyleInfo } from "../../build/oxia2tsx/types.js";
-import { getStyleId, registerComponentStyle, registerSlotStyle, type StyleRegistry } from "../../build/tsx2html/style-registry.js";
+import { getStyleId, registerScopedStyle, registerSlotStyle, type StyleRegistry } from "../../build/tsx2html/style-registry.js";
 import { STYLE_SCOPE_ATTRIBUTE_PREFIX, STYLE_SCOPE_CLASS_PREFIX } from "../../build/tsx2html/types.js";
 import { Log } from "../../util/log.js";
 
@@ -457,17 +457,17 @@ export default class Element {
 		}
 	}
 
-	registerStyles(styleRegistry: StyleRegistry) {
+	registerScopedStyles(styleRegistry: StyleRegistry) {
 		if (this.isComponent) {
 			const styles = this.getStyles();
 			if (styles && styles.length) {
-				const styleUuid = registerComponentStyle(styleRegistry, styles);
+				const styleUuid = registerScopedStyle(styleRegistry, styles);
 				this.initStyleRegistryReferences(styleUuid);
 			}
 		}
 
 		for (let i = 0; i < this.children.length; ++i) {
-			this.children[i].registerStyles(styleRegistry);
+			this.children[i].registerScopedStyles(styleRegistry);
 		}
 	}
 
@@ -776,14 +776,14 @@ export default class Element {
 		return this;
 	}
 
-	resolveStyles(styleRegistry: StyleRegistry) {
+	resolveScopedStyles(styleRegistry: StyleRegistry) {
 		if (!this.isHead && !this.isHeadChild && this.styleUuid) {
 			// Resolve styleUuid to actual style scope ID
 			this.styleId = getStyleId(styleRegistry, this.styleUuid);
 		}
 
 		for (let i = 0; i < this.children.length; ++i) {
-			this.children[i].resolveStyles(styleRegistry);
+			this.children[i].resolveScopedStyles(styleRegistry);
 		}
 	}
 

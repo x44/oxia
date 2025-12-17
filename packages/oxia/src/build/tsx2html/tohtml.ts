@@ -1,16 +1,18 @@
 import { basename, dirname } from "node:path";
 import type { ResolvedOptions } from "../../config/types.js";
+import { OxiaLoader } from "../../loader/OxiaLoader.js";
 import type Element from "../../react/elements/Element.js";
 import { React } from "../../react/react.js";
 import type { BuildProps } from "../../react/types.js";
 import { Log } from "../../util/log.js";
 import type { RouteFile } from "../file/file.js";
-import { createStyleRegistry, getStyleRegistryCss } from "./style-registry.js";
+import { createStyleRegistry, getStyleRegistryCss, registerGlobalStyle } from "./style-registry.js";
 //@ts-ignore
 import Script from "../../react/components/Script.oxia";
 //@ts-ignore
 import Style from "../../react/components/Style.oxia";
 import { Timings } from "../../util/timings.js";
+import { getGlobalStylesForModules } from "../oxia2tsx/module-registry.js";
 
 export default async function toHtml(options: ResolvedOptions, file: RouteFile) {
 	// Log.debug("converting", srcFilePath);
@@ -48,7 +50,6 @@ export default async function toHtml(options: ResolvedOptions, file: RouteFile) 
 	(globalThis as any).Script = Script;
 	(globalThis as any).Style = Style;
 
-
 	const fileUrl = file.oxiaAbsPath;
 
 	// Load the .oxia file and invoke the default export function
@@ -56,7 +57,20 @@ export default async function toHtml(options: ResolvedOptions, file: RouteFile) 
 
 	Timings.begin("import");
 
+	// Collect module file paths for global style look-up
+	const importedModuleSrcFilePathsSet = new Set<string>();
+	const importedModuleSrcFilePaths: string[] = [];
+
+	OxiaLoader.setOxiaFileResolvedListener(absFile => {
+		if (!importedModuleSrcFilePathsSet.has(absFile)) {
+			importedModuleSrcFilePathsSet.add(absFile);
+			importedModuleSrcFilePaths.push(absFile);
+		}
+	});
+
 	const module = await import(fileUrl);
+
+	OxiaLoader.setOxiaFileResolvedListener(undefined);
 
 	Timings.end();
 
@@ -94,18 +108,22 @@ export default async function toHtml(options: ResolvedOptions, file: RouteFile) 
 	if (root) {
 		const styleRegistry = createStyleRegistry(options.build.scopedStyleStrategy);
 
+		const globalStyles = getGlobalStylesForModules(importedModuleSrcFilePaths);
+		registerGlobalStyle(styleRegistry, globalStyles);
+
 		// root.addDebugInfo();
 
 		root.initComponentReferences();
 
-		root.registerStyles(styleRegistry);
+		root.registerScopedStyles(styleRegistry);
 
 		root = root.slotify(styleRegistry);
 
 		root = root.render()!;
 		root = root.flatify(!options.build.keepFragments, !options.build.keepSlots);
 
-		root.resolveStyles(styleRegistry);
+		root.resolveScopedStyles(styleRegistry);
+
 		const css = getStyleRegistryCss(styleRegistry);
 		root.setRouteCss(html, head, body, css);
 

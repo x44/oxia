@@ -14,8 +14,11 @@ export function deletePreprocessedModule(srcFilePath: string) {
 	if (!module) return;
 	moduleRegistry.delete(srcFilePath);
 
-	// Delete module-level style
-	if (module.styleId) styleRegistry.delete(module.styleId);
+	// Delete module-level global style
+	if (module.globalStyleId) styleRegistry.delete(module.globalStyleId);
+
+	// Delete module-level scoped style
+	if (module.scopedStyleId) styleRegistry.delete(module.scopedStyleId);
 
 	// Delete functions
 	for (const functionId of module.functionIds) {
@@ -35,7 +38,8 @@ export function createPreprocessedModule(srcFilePath: string) {
 	const module: PreprocessedModule = {
 		srcFilePath,
 		functionIds: [],
-		styleId: undefined,
+		globalStyleId: undefined,
+		scopedStyleId: undefined,
 	};
 	moduleRegistry.set(srcFilePath, module);
 }
@@ -55,10 +59,16 @@ export function createPreprocessedFunction(srcFilePath: string, functionBlock: F
 }
 
 
+export function createPreprocessedGlobalStyle(srcFilePath: string, styleBlock: CombinedStyleBlock) {
+	const style = createPreprocessedStyle("global", styleBlock);
+	const module = moduleRegistry.get(srcFilePath)!;
+	module.globalStyleId = style.styleId;
+}
+
 export function createPreprocessedModuleStyle(srcFilePath: string, styleBlock: CombinedStyleBlock) {
 	const style = createPreprocessedStyle("module", styleBlock);
 	const module = moduleRegistry.get(srcFilePath)!;
-	module.styleId = style.styleId;
+	module.scopedStyleId = style.styleId;
 }
 
 export function createPreprocessedFunctionStyle(functionId: string, styleBlock: CombinedStyleBlock) {
@@ -74,7 +84,6 @@ export function createPreprocessedFunctionSlotStyle(functionId: string, slotName
 	func.slotStyleIds.push(style.styleId);
 	style.functionId = functionId;
 }
-
 
 function createPreprocessedStyle(level: StyleLevel, styleBlock: CombinedStyleBlock) {
 	const style: PreprocessedStyle = {
@@ -122,19 +131,14 @@ export function getPreprocessedSlotStyle(slotStyleId: string) {
 	return slotStyleRegistry.get(slotStyleId)!;
 }
 
-function getPreprocessedModuleStyleId(srcFilePath: string) {
+function getPreprocessedGlobalStyle(srcFilePath: string) {
 	const module = moduleRegistry.get(srcFilePath)!;
-	return module.styleId;
+	return module.globalStyleId ? getPreprocessedStyle(module.globalStyleId) : undefined;
 }
 
 function getPreprocessedModuleStyle(srcFilePath: string) {
 	const module = moduleRegistry.get(srcFilePath)!;
-	return module.styleId ? getPreprocessedStyle(module.styleId) : undefined;
-}
-
-function getPreprocessedFunctionStyleId(functionId: string) {
-	const func = functionRegistry.get(functionId)!;
-	return func.styleId;
+	return module.scopedStyleId ? getPreprocessedStyle(module.scopedStyleId) : undefined;
 }
 
 function getPreprocessedFunctionStyle(functionId: string) {
@@ -145,8 +149,10 @@ function getPreprocessedFunctionStyle(functionId: string) {
 export function treeifyPreprocessedStyles(srcFilePath: string) {
 	const module = moduleRegistry.get(srcFilePath)!;
 
-	// Create the style tree hierarchy using the function hierarchy
-	const moduleStyle = module.styleId ? styleRegistry.get(module.styleId) : undefined;
+	// Create the style tree hierarchy using the function hierarchy.
+	// Note that we do not treeify the module's global style, since
+	// global styles have no hierarchy
+	const moduleStyle = module.scopedStyleId ? styleRegistry.get(module.scopedStyleId) : undefined;
 	let parentStyle = moduleStyle;
 	for (const functionId of module.functionIds) {
 		const func = functionRegistry.get(functionId)!;
@@ -177,9 +183,14 @@ export function dumpPreprocessedModule(srcFilePath: string) {
 	console.log("-----------------------------------------------------------------------------------------------");
 	console.log(`Module '${module.srcFilePath}'`);
 
+	const globalStyle = getPreprocessedGlobalStyle(srcFilePath);
+	if (globalStyle) {
+		console.log(`  GlobalStyle ${globalStyle.styleId}`);
+	}
+
 	const moduleStyle = getPreprocessedModuleStyle(srcFilePath);
 	if (moduleStyle) {
-		console.log(`  Style ${moduleStyle.styleId}`);
+		console.log(`  ScopedStyle ${moduleStyle.styleId}`);
 	}
 
 	const functionIds = module.functionIds;

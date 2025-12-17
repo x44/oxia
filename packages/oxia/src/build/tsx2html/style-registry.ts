@@ -1,18 +1,22 @@
 import type { ScopedStyleStrategy } from "../../config/types.js";
 import { enc26 } from "../../util/uuid.js";
-import { processCss } from "../postcss/postcss.js";
 import type { FunctionInfo, ModuleInfo, SlotStyleInfo, StyleInfo } from "../oxia2tsx/types.js";
+import { processGlobalCss, processScopedCss } from "../postcss/postcss.js";
 
 // Must import to have global scope initialized
 import "./style-results.js";
 import { getStyleResult } from "./style-results.js";
 
-type UnresolvedComponentCss = {
+type GlobalStyleRegistry = {
+	css: string;
+}
+
+type UnresolvedScopedCss = {
 	uuid: string;
 	styles: StyleInfo[];
 }
 
-type ResolvedComponentCss = {
+type ResolvedScopedCss = {
 	uuid: string;
 	styleId: string;
 	module: ModuleInfo;
@@ -20,11 +24,11 @@ type ResolvedComponentCss = {
 	css: string;
 }
 
-type ComponentStyleRegistry = {
-	unresolvedMap: Map<string, UnresolvedComponentCss>;
-	unresolvedList: UnresolvedComponentCss[];
-	resolvedMap: Map<string, ResolvedComponentCss>;
-	resolvedList: ResolvedComponentCss[];
+type ScopedStyleRegistry = {
+	unresolvedMap: Map<string, UnresolvedScopedCss>;
+	unresolvedList: UnresolvedScopedCss[];
+	resolvedMap: Map<string, ResolvedScopedCss>;
+	resolvedList: ResolvedScopedCss[];
 }
 
 type UnresolvedSlotCss = {
@@ -51,7 +55,8 @@ type SlotStyleRegistry = {
 }
 
 export type StyleRegistry = {
-	componentStyleRegistry: ComponentStyleRegistry;
+	globalStyleRegistry: GlobalStyleRegistry;
+	scopedStyleRegistry: ScopedStyleRegistry;
 	slotStyleRegistry: SlotStyleRegistry;
 
 	scopedStyleStrategy: ScopedStyleStrategy;
@@ -62,7 +67,8 @@ const DEBUG = false;
 
 export function createStyleRegistry(scopedStyleStrategy: ScopedStyleStrategy): StyleRegistry {
 	return {
-		componentStyleRegistry: createComponentStyleRegistry(),
+		globalStyleRegistry: createGlobalStyleRegistry(),
+		scopedStyleRegistry: createScopedStyleRegistry(),
 		slotStyleRegistry: createSlotStyleRegistry(),
 		scopedStyleStrategy,
 		nextStyleId: 0,
@@ -72,9 +78,13 @@ export function createStyleRegistry(scopedStyleStrategy: ScopedStyleStrategy): S
 export function getStyleRegistryCss(styleRegistry: StyleRegistry) {
 	let css = "";
 
-	if (DEBUG) css += textBox("*** COMPONENT STYLES ***");
+	if (DEBUG) css += textBox("*** GLOBAL STYLES ***");
 
-	css += getComponentStyleRegistryCss(styleRegistry.componentStyleRegistry);
+	css += getGlobalStyleRegistryCss(styleRegistry.globalStyleRegistry);
+
+	if (DEBUG) css += textBox("*** SCOPED STYLES ***");
+
+	css += getScopedStyleRegistryCss(styleRegistry.scopedStyleRegistry);
 
 	if (DEBUG) css += textBox("*** SLOT STYLE OVERRIDES ***");
 
@@ -84,8 +94,8 @@ export function getStyleRegistryCss(styleRegistry: StyleRegistry) {
 }
 
 export function getStyleId(styleRegistry: StyleRegistry, uuid: string) {
-	if (uuid.startsWith("COMPONENT-")) {
-		return getComponentStyleId(styleRegistry, uuid);
+	if (uuid.startsWith("SCOPED-")) {
+		return getScopedStyleId(styleRegistry, uuid);
 	} else
 	if (uuid.startsWith("SLOT-")) {
 		return getSlotStyleId(styleRegistry, uuid);
@@ -97,25 +107,47 @@ function getNextStyleId(styleRegistry: StyleRegistry) {
 	return enc26(styleRegistry.nextStyleId++);
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
-// COMPONENT STYLE REGISTRY
+// GLOBAL STYLE REGISTRY
 ////////////////////////////////////////////////////////////////////////////////
 
-function createComponentStyleRegistry(): ComponentStyleRegistry {
+function createGlobalStyleRegistry(): GlobalStyleRegistry {
 	return {
-		unresolvedMap: new Map<string, UnresolvedComponentCss>(),
+		css: "",
+	}
+}
+
+function getGlobalStyleRegistryCss(registry: GlobalStyleRegistry) {
+	return registry.css;
+}
+
+export function registerGlobalStyle(registry: StyleRegistry, styles: StyleInfo[]) {
+	let css = combineCss(styles);
+	css = processGlobalCss("dummy", css);
+	registry.globalStyleRegistry.css = css;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// SCOPED STYLE REGISTRY
+////////////////////////////////////////////////////////////////////////////////
+
+function createScopedStyleRegistry(): ScopedStyleRegistry {
+	return {
+		unresolvedMap: new Map<string, UnresolvedScopedCss>(),
 		unresolvedList: [],
-		resolvedMap: new Map<string, ResolvedComponentCss>(),
+		resolvedMap: new Map<string, ResolvedScopedCss>(),
 		resolvedList: [],
 	}
 }
 
-function getComponentStyleRegistryCss(registry: ComponentStyleRegistry) {
+function getScopedStyleRegistryCss(registry: ScopedStyleRegistry) {
 	let css = "";
 	for (let i = 0; i < registry.resolvedList.length; ++i) {
 		if (DEBUG) {
 			const strs = registry.resolvedList[i].functions.map(func => !func ? "Module" : `${func.name}()`);
-			css += textBox("COMPONENT STYLE", registry.resolvedList[i].module.srcFilePath, strs.join(" + "));
+			css += textBox("SCOPED STYLE", registry.resolvedList[i].module.srcFilePath, strs.join(" + "));
 		}
 
 		css += registry.resolvedList[i].css;
@@ -123,51 +155,51 @@ function getComponentStyleRegistryCss(registry: ComponentStyleRegistry) {
 	return css;
 }
 
-export function registerComponentStyle(registry: StyleRegistry, styles: StyleInfo[]) {
-	const uuid = getComponentStyleUuid(styles);
+export function registerScopedStyle(registry: StyleRegistry, styles: StyleInfo[]) {
+	const uuid = getScopedStyleUuid(styles);
 
-	let styleCss = registry.componentStyleRegistry.unresolvedMap.get(uuid);
+	let styleCss = registry.scopedStyleRegistry.unresolvedMap.get(uuid);
 	if (!styleCss) {
-		// debug("CREATING UNRESOLVED COMPONENT STYLE", uuid);
+		// debug("CREATING UNRESOLVED SCOPED STYLE", uuid);
 
 		styleCss = {
 			uuid,
 			styles: [...styles],
 		}
 
-		registry.componentStyleRegistry.unresolvedMap.set(uuid, styleCss);
-		registry.componentStyleRegistry.unresolvedList.push(styleCss);
+		registry.scopedStyleRegistry.unresolvedMap.set(uuid, styleCss);
+		registry.scopedStyleRegistry.unresolvedList.push(styleCss);
 	}
 
 	return styleCss.uuid;
 }
 
-function getComponentStyleUuid(styles: StyleInfo[]) {
+function getScopedStyleUuid(styles: StyleInfo[]) {
 	const styleIds = styles.map(style => style.styleId);
-	// Tag the uuid with "COMPONENT", so we know where to look it up then the resolved style is requested
-	const uuid = `COMPONENT-${[styleIds].join("+")}`;
+	// Tag the uuid with "SCOPED", so we know where to look it up when the resolved style is requested
+	const uuid = `SCOPED-${[styleIds].join("+")}`;
 	return uuid;
 }
 
-function getComponentStyleId(registry: StyleRegistry, uuid: string) {
-	let resolvedComponentCss = registry.componentStyleRegistry.resolvedMap.get(uuid);
-	if (!resolvedComponentCss) {
-		const unresolvedComponentCss = registry.componentStyleRegistry.unresolvedMap.get(uuid)!;
-		resolvedComponentCss = resolveComponentCss(registry, unresolvedComponentCss);
-		registry.componentStyleRegistry.resolvedMap.set(uuid, resolvedComponentCss);
-		registry.componentStyleRegistry.resolvedList.push(resolvedComponentCss);
+function getScopedStyleId(registry: StyleRegistry, uuid: string) {
+	let resolvedScopedCss = registry.scopedStyleRegistry.resolvedMap.get(uuid);
+	if (!resolvedScopedCss) {
+		const unresolvedScopedCss = registry.scopedStyleRegistry.unresolvedMap.get(uuid)!;
+		resolvedScopedCss = resolveScopedCss(registry, unresolvedScopedCss);
+		registry.scopedStyleRegistry.resolvedMap.set(uuid, resolvedScopedCss);
+		registry.scopedStyleRegistry.resolvedList.push(resolvedScopedCss);
 	}
 
-	return resolvedComponentCss.styleId;
+	return resolvedScopedCss.styleId;
 }
 
-function resolveComponentCss(registry: StyleRegistry, unresolved: UnresolvedComponentCss): ResolvedComponentCss {
+function resolveScopedCss(registry: StyleRegistry, unresolved: UnresolvedScopedCss): ResolvedScopedCss {
 	const styles = unresolved.styles;
-	const styleId = getNextComponentStyleId(registry, styles);
+	const styleId = getNextScopedStyleId(registry, styles);
 	let css = combineCss(styles);
-	css = processCss(registry.scopedStyleStrategy, "dummy", css, styleId);
+	css = processScopedCss(registry.scopedStyleStrategy, "dummy", css, styleId);
 
-	const resolved: ResolvedComponentCss = {
+	const resolved: ResolvedScopedCss = {
 		uuid: unresolved.uuid,
 		styleId,
 		module: styles[0].module,
@@ -178,7 +210,7 @@ function resolveComponentCss(registry: StyleRegistry, unresolved: UnresolvedComp
 	return resolved;
 }
 
-function getNextComponentStyleId(registry: StyleRegistry, styles: StyleInfo[]) {
+function getNextScopedStyleId(registry: StyleRegistry, styles: StyleInfo[]) {
 	let id: string | undefined = undefined;
 	const fixedIds: string[] = [];
 	let useFixedIds = false;
@@ -198,8 +230,6 @@ function getNextComponentStyleId(registry: StyleRegistry, styles: StyleInfo[]) {
 	}
 	return id || getNextStyleId(registry);
 }
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +293,7 @@ export function registerSlotStyle(registry: StyleRegistry, slotParentStyles: Sty
 function getSlotStyleUuid(slotParentStyles: StyleInfo[], slotChildStyles: StyleInfo[], slotStyle: SlotStyleInfo) {
 	const slotParentStyleIds = slotParentStyles.map(style => style.styleId);
 	const slotChildStyleIds = slotChildStyles.map(style => style.styleId);
-	// Tag the uuid with "SLOT", so we know where to look it up then the resolved style is requested
+	// Tag the uuid with "SLOT", so we know where to look it up when the resolved style is requested
 	const uuid = `SLOT-${[slotParentStyleIds, slotChildStyleIds, slotStyle.styleId].join("+")}`;
 	return uuid;
 }
@@ -285,7 +315,7 @@ function resolveSlotCss(registry: StyleRegistry, unresolved: UnresolvedSlotCss):
 
 	const styleId = getNextSlotStyleId(registry, childStyles, slotStyle);
 	let css = combineCss(childStyles, slotStyle);
-	css = processCss(registry.scopedStyleStrategy, "dummy", css, styleId);
+	css = processScopedCss(registry.scopedStyleStrategy, "dummy", css, styleId);
 
 	const resolved: ResolvedSlotCss = {
 		uuid: unresolved.uuid,

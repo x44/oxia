@@ -80,7 +80,7 @@ const scopeWherePlugin = (scopeId: string) => {
 	};
 };
 
-export function processCss(scopedStyleStrategy: ScopedStyleStrategy, srcFilePath: string, css: string, scopeId: string) {
+export function processScopedCss(scopedStyleStrategy: ScopedStyleStrategy, srcFilePath: string, css: string, scopeId: string) {
 	const scopePlugin = scopedStyleStrategy === "attribute"
 		? scopeAttributesPlugin
 		: scopedStyleStrategy === "class"
@@ -90,7 +90,16 @@ export function processCss(scopedStyleStrategy: ScopedStyleStrategy, srcFilePath
 	let out = css;
 	out = postcss([
 		scopePlugin(scopeId),
-		combineDuplicateSelectors({removeDuplicatedProperties: true}),
+		combineDuplicateSelectors({ removeDuplicatedProperties: true }),
+		discardComments(),
+	]).process(out, { from: srcFilePath }).css;
+	return out;
+}
+
+export function processGlobalCss(srcFilePath: string, css: string) {
+	let out = css;
+	out = postcss([
+		combineDuplicateSelectors({ removeDuplicatedProperties: true }),
 		discardComments(),
 	]).process(out, { from: srcFilePath }).css;
 	return out;

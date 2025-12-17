@@ -26,6 +26,7 @@ export type StyleBlock = {
 	attributes: Map<string, string>;
 
 	inline: boolean;
+	global: boolean;
 	slotName: string | undefined;
 
 	tsBlocks: StyleTsBlock[];
@@ -77,13 +78,15 @@ export type FunctionBlock = {
 	fragmentCloseTagInsertPos?: number;
 }
 
-export type StyleLevel = "module" | "function";
+export type StyleLevel = "global" | "module" | "function";
 
 export type PreprocessedModule = {
 	srcFilePath: string;
 	functionIds: string[];
-	/** Module-level style */
-	styleId: string | undefined;
+	/** Module-level global style */
+	globalStyleId: string | undefined;
+	/** Module-level scoped style */
+	scopedStyleId: string | undefined;
 }
 
 export type PreprocessedFunction = {
@@ -122,8 +125,12 @@ export type PreprocessedSlotStyle = {
 export type ModuleInfo = {
 	srcFilePath: string;
 	rootFunctions: FunctionInfo[];
-	/** Note that rootStyles are not necessarily on the module level! A rootStyle may also "start" at any function. */
-	rootStyles: StyleInfo[];
+	/**
+	 * Note that rootScopedStyles are not necessarily on the module level!
+	 * A rootScopedStyle may also "start" at any function.
+	 */
+	rootScopedStyles: StyleInfo[];
+	globalStyle: StyleInfo | undefined;
 }
 
 export type FunctionInfo = {
@@ -149,7 +156,7 @@ type BaseStyleInfo = {
 }
 
 export type StyleInfo = BaseStyleInfo & {
-	level: "module" | "function";
+	level: StyleLevel;
 	/** For both "module" and "function" level styles */
 	module: ModuleInfo;
 	/** Only for "function" level styles */

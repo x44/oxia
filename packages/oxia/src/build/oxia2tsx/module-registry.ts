@@ -7,7 +7,9 @@ const moduleRegistry = new Map<string, ModuleInfo>();
 /** Key: functionId */
 const functionRegistry = new Map<string, FunctionInfo>();
 /** Key: styleId */
-const styleRegistry = new Map<string, StyleInfo>();
+const globalStyleRegistry = new Map<string, StyleInfo>();
+/** Key: styleId */
+const scopedStyleRegistry = new Map<string, StyleInfo>();
 /** Key: styleId */
 const slotStyleRegistry = new Map<string, SlotStyleInfo>();
 
@@ -22,9 +24,14 @@ export function deleteModule(srcFilePath: string) {
 		deleteFunction(func);
 	}
 
-	// Styles
-	for (const style of module.rootStyles) {
-		deleteStyle(style);
+	// Global Style
+	if (module.globalStyle) {
+		deleteGlobalStyle(module.globalStyle);
+	}
+
+	// Scoped Styles
+	for (const style of module.rootScopedStyles) {
+		deleteScopedStyle(style);
 	}
 }
 
@@ -39,10 +46,14 @@ function deleteFunction(func: FunctionInfo) {
 	}
 }
 
-function deleteStyle(style: StyleInfo) {
-	styleRegistry.delete(style.styleId);
+function deleteGlobalStyle(style: StyleInfo) {
+	globalStyleRegistry.delete(style.styleId);
+}
+
+function deleteScopedStyle(style: StyleInfo) {
+	scopedStyleRegistry.delete(style.styleId);
 	for (const child of style.children) {
-		deleteStyle(child);
+		deleteScopedStyle(child);
 	}
 }
 
@@ -57,7 +68,8 @@ export function createModule(srcModule: PreprocessedModule) {
 		module = {
 			srcFilePath,
 			rootFunctions: [],
-			rootStyles: [],
+			rootScopedStyles: [],
+			globalStyle: undefined,
 		}
 		moduleRegistry.set(srcFilePath, module);
 	}
@@ -82,8 +94,14 @@ export function createModule(srcModule: PreprocessedModule) {
 		}
 	}
 
-	if (srcModule.styleId) {
-		rootStyleIds.push(srcModule.styleId);
+	if (srcModule.globalStyleId) {
+		const srcStyle = getPreprocessedStyle(srcModule.globalStyleId);
+		const style = addStyle(module, undefined, srcStyle);
+		module.globalStyle = style;
+	}
+
+	if (srcModule.scopedStyleId) {
+		rootStyleIds.push(srcModule.scopedStyleId);
 	}
 
 	for (const rootStyleId of rootStyleIds) {
@@ -91,7 +109,7 @@ export function createModule(srcModule: PreprocessedModule) {
 		if (!srcStyle.parentStyleId) {
 			// Root styles only
 			const style = addStyle(module, undefined, srcStyle);
-			module.rootStyles.push(style);
+			module.rootScopedStyles.push(style);
 		}
 	}
 }
@@ -129,7 +147,7 @@ function addStyle(module: ModuleInfo, parent: StyleInfo | undefined, src: Prepro
 		fixedId: src.fixedId,
 		attributes: src.attributes,
 		css: src.css,
-		level: src.level!,
+		level: src.level,
 		module,
 		function: func,
 		parent,
@@ -137,16 +155,20 @@ function addStyle(module: ModuleInfo, parent: StyleInfo | undefined, src: Prepro
 		tsBlocks: [...src.tsBlocks],
 	};
 
-	addStyleToFunctions(module, style);
+	if (src.level === "global") {
+		globalStyleRegistry.set(style.styleId, style);
+	} else {
+		scopedStyleRegistry.set(style.styleId, style);
 
-	styleRegistry.set(style.styleId, style);
+		addStyleToFunctions(module, style);
 
-	if (parent) {
-		parent.children.push(style);
-	}
+		if (parent) {
+			parent.children.push(style);
+		}
 
-	for (const childStyleId of src.childStyleIds) {
-		addStyle(module, style, getPreprocessedStyle(childStyleId));
+		for (const childStyleId of src.childStyleIds) {
+			addStyle(module, style, getPreprocessedStyle(childStyleId));
+		}
 	}
 
 	return style;
@@ -167,9 +189,9 @@ function addSlotStyle(src: PreprocessedSlotStyle) {
 		tsBlocks: [...src.tsBlocks],
 	};
 
-	func.slotStyles.set(style.slotName, style);
-
 	slotStyleRegistry.set(style.styleId, style);
+
+	func.slotStyles.set(style.slotName, style);
 
 	return style;
 }
@@ -201,6 +223,17 @@ function addStyleToFunction(func: FunctionInfo, style: StyleInfo, add = false) {
 	for (const childFunc of func.children) {
 		addStyleToFunction(childFunc, style, add);
 	}
+}
+
+export function getGlobalStylesForModules(srcFilePaths: string[]) {
+	const styles: StyleInfo[] = [];
+	for (const srcFilePath of srcFilePaths) {
+		const module = moduleRegistry.get(srcFilePath)!;
+		if (module.globalStyle) {
+			styles.push(module.globalStyle);
+		}
+	}
+	return styles;
 }
 
 export function getFunction(functionId: string) {
