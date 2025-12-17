@@ -1,5 +1,12 @@
 # oxia
 
+## 0.0.7
+
+### Patch Changes
+
+- 070632d: Added global styles
+- 7ef24c1: Added VS Code extension suggestion
+
 ## 0.0.6
 
 ### Patch Changes
