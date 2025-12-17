@@ -1,0 +1,9 @@
+// export default function Component() {
+// 	return <div>Component</div>
+// }
+
+<style is:global>
+div {
+	border: 1px solid orange;
+}
+</style>

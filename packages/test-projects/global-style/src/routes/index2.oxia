@@ -1,0 +1,43 @@
+import Component from "../components/Component.oxia";
+import "../components/StyleOnly.oxia";
+
+export default function index() {
+	return (
+		<body>
+			<style>
+			div {
+				color: red;
+			}
+			</style>
+			<div>Hello, world!</div>
+			<Component></Component>
+		</body>
+	)
+
+	<style>
+		div {
+			color: green;
+		}
+	</style>
+}
+
+
+<style is:global>
+body {
+	background-color: #ffffff;
+	color: magenta;
+}
+</style>
+
+<style is:global>
+span {
+	background-color: #000000;
+	color: cyan;
+}
+</style>
+
+// <style>
+// body {
+// 	background: #400000;
+// }
+// </style>

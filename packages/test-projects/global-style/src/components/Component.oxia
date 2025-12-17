@@ -1,0 +1,17 @@
+import "./StyleOnly.oxia";
+
+export default function Component() {
+	return <div>Component</div>
+}
+
+<style>
+div {
+	font-size: 64px;
+}
+</style>
+
+<style is:global>
+div {
+	border: 1px solid orange;
+}
+</style>
