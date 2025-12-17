@@ -1,5 +1,13 @@
 # @test-projects/inline-style
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [070632d]
+- Updated dependencies [7ef24c1]
+  - oxia@0.0.7
+
 ## 0.0.5
 
 ### Patch Changes

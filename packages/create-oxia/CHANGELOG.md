@@ -1,5 +1,12 @@
 # create-oxia
 
+## 0.0.7
+
+### Patch Changes
+
+- 719af22: Updated template minimal
+- 7ef24c1: Added VS Code extension suggestion
+
 ## 0.0.6
 
 ### Patch Changes

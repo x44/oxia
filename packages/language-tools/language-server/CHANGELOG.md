@@ -1,5 +1,11 @@
 # @oxia/language-server
 
+## 0.0.9
+
+### Patch Changes
+
+- 7ef24c1: Activate on project level
+
 ## 0.0.8
 
 ### Patch Changes
