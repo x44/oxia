@@ -828,7 +828,7 @@ interface AllHTMLAttributes<T> extends HTMLAttributes<T> {
 	capture?: boolean | "user" | "environment" | undefined;
 	cellPadding?: number | string | undefined;
 	cellSpacing?: number | string | undefined;
-	charSet?: string | undefined;
+	charset?: string | undefined;
 	challenge?: string | undefined;
 	checked?: boolean | undefined;
 	cite?: string | undefined;
@@ -1236,7 +1236,7 @@ interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
 	referrerPolicy?: HTMLAttributeReferrerPolicy | undefined;
 	sizes?: string | undefined;
 	type?: string | undefined;
-	charSet?: string | undefined;
+	charset?: string | undefined;
 }
 
 interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1261,7 +1261,7 @@ interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
 }
 
 interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
-	charSet?: string | undefined;
+	charset?: string | undefined;
 	content?: string | undefined;
 	httpEquiv?: string | undefined;
 	media?: string | undefined;
