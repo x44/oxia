@@ -2,7 +2,6 @@ function __ws__connect(reloadOnOpen) {
 	const ws = new WebSocket(`ws://${location.host}`);
 
 	ws.onopen = () => {
-		// console.log("websocket opened");
 		if (reloadOnOpen) {
 			location.reload();
 		}
@@ -13,8 +12,11 @@ function __ws__connect(reloadOnOpen) {
 		await __ws__connect(true);
 	};
 
-	ws.onmessage = () => {
-		location.reload();
+	ws.onmessage = (msg) => {
+		const { routes } = payload = JSON.parse(msg.data);
+		if (routes.includes(location.pathname)) {
+			location.reload();
+		}
 	};
 }
 

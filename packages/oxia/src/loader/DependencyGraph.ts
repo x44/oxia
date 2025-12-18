@@ -82,6 +82,15 @@ export class DependencyGraph {
 		}
 	}
 
+	isInvalid(path: string) {
+		const node = this.nodes.get(path);
+		// If the node does not exist (yet) return invalid.
+		// This avoids that the caller has to check if a module exists
+		// in the first build-run.
+		if (!node) return true;
+		return node.invalidated;
+	}
+
 	getTimestamp(path: string) {
 		const node = this.nodes.get(path)!;
 		node.requested = true;

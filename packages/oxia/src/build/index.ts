@@ -11,7 +11,7 @@ import { absPath, copyDir, delDir, relPath, slashify, writeTextFile } from "../u
 import { Log } from "../util/log.js";
 import { Timings } from "../util/timings.js";
 import { initArgs } from "./args.js";
-import { createRouteFile } from "./file/file.js";
+import { createRouteFile, type RouteFile } from "./file/file.js";
 import { tsx2html, writeErrorHtml } from "./tsx2html/index.js";
 
 type ChangeType = "sources" | "static" | "all";
@@ -48,19 +48,26 @@ function collectRouteFiles(options: ResolvedOptions) {
 		return included;
 	});
 
-	// debug(routeFiles);
+	// Log.debug(routeFiles);
 	return routeFiles.map(routeFile => createRouteFile(options, routeFile));
 }
 
-/** Builds all route files to dist */
+/** Builds to dist */
 async function build(options: ResolvedOptions) {
 	const routeFiles = collectRouteFiles(options);
 	if (routeFiles.length === 0) {
 		Log.warn("no route files in", options.paths.routes);
-		return;
+		return [];
 	}
 
+	const routeFilesBuilt: RouteFile[] = [];
+
 	for await (const routeFile of routeFiles) {
+
+		if (!OxiaLoader.isInvalid(routeFile.oxiaAbsPath)) {
+			continue;
+		}
+
 		Timings.begin(`Building ${routeFile.oxiaRelPath}`);
 
 		try {
@@ -73,7 +80,11 @@ async function build(options: ResolvedOptions) {
 
 		Timings.end();
 		Timings.printOne(options.main.timings ? -1 : 0);
+
+		routeFilesBuilt.push(routeFile);
 	}
+
+	return routeFilesBuilt;
 }
 
 /** Copies all static files to dist */
@@ -112,6 +123,7 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 	OxiaLoader.beforeImport(options.paths.source, new Date().getTime());
 
 	let ok = true;
+	let routeFilesBuilt: RouteFile[] = [];
 
 	if (options.main.rebuildAll) {
 		if (changeType === "sources") {
@@ -122,9 +134,11 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 	if (changeType === "sources" || changeType === "all") {
 
 		// CLEAN DIST
-		cleanDst(options);
+		if (changedFiles === "all") {
+			cleanDst(options);
+		}
 
-		// CLEAN MEM FS
+		// INVALIDATE CHANGED FILES
 		if (changedFiles === "all") {
 			OxiaLoader.invalidateAll();
 		} else {
@@ -133,7 +147,7 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 
 		// BUILD
 		try {
-			await build(options);
+			routeFilesBuilt = await build(options);
 		} catch (err) {
 			Log.error(err);
 			ok = false;
@@ -155,10 +169,15 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 	}
 
 	// RELOAD
-	reloadServer();
+	if (routeFilesBuilt.length) {
+		const routesToReload = routeFilesBuilt.map(f => f.routePath);
+		reloadServer(routesToReload);
+	}
 
 	if (ok) {
-		Timings.printSum();
+		if (routeFilesBuilt.length) {
+			Timings.printSum();
+		}
 	} else {
 		Log.writeln(`${chalk.bgRed.white(" Build failed! ")}`);
 	}
@@ -289,8 +308,8 @@ async function startServer(options: ResolvedOptions) {
 	await startDevServer(options);
 }
 
-function reloadServer() {
-	reloadDevServer();
+function reloadServer(routesToReload: string[]) {
+	reloadDevServer(routesToReload);
 }
 
 async function onSourceFilesChanged(options: ResolvedOptions, changedFiles: string[] | "all") {

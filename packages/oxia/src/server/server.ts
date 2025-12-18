@@ -248,12 +248,17 @@ async function start(app: Express, host: string, port: number, name: string) {
 	});
 }
 
-export function reloadDevServer() {
+export function reloadDevServer(routesToReload?: string[]) {
+	routesToReload ||= [];
+	routesToReload = routesToReload.map(r => `${r.startsWith("/") ? "" : "/"}${r}${r.endsWith("/") ? "" : "/"}`);
+	const payload = JSON.stringify({
+		routes: routesToReload,
+	});
 	for (const devServer of devServers) {
 		if (devServer.wss) {
 			devServer.wss.clients.forEach(client => {
 				if (client.readyState === 1) {
-					client.send("reload");
+					client.send(payload);
 				}
 			});
 		}

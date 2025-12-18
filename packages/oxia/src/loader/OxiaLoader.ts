@@ -54,6 +54,10 @@ export class OxiaLoader {
 		OxiaLoader.instance.dependencyGraph.invalidate(changedFiles, OxiaLoader.instance.timestamp);
 	}
 
+	static isInvalid(absFile: string) {
+		return OxiaLoader.instance.dependencyGraph.isInvalid(absFile);
+	}
+
 	static setOxiaFileResolvedListener(oxiaFileResolvedListener: ((absFile: string) => void) | undefined) {
 		OxiaLoader.instance.oxiaFileResolvedListener = oxiaFileResolvedListener;
 	}
