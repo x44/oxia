@@ -820,7 +820,7 @@ export default class Element {
 		let classAttribute: Attribute | undefined = undefined;
 		for (let i = 0; i < attributes.length; ++i) {
 			let attribute = attributes[i];
-			if (attribute.key === "class" || attribute.key === "className") {
+			if (attribute.key === "class") {
 				const val = this.attributeValueToStringOrBoolean(attribute.val);
 				if (typeof val === "string") {
 					attribute = createOrAppendClassName(val);

@@ -735,7 +735,6 @@ interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
 	accessKey?: string | undefined;
 	autoCapitalize?: "off" | "none" | "on" | "sentences" | "words" | "characters" | undefined | (string & {});
 	autoFocus?: boolean | undefined;
-	className?: string | undefined;
 	contentEditable?: Booleanish | "inherit" | "plaintext-only" | undefined;
 	contextMenu?: string | undefined;
 	dir?: string | undefined;
@@ -1238,9 +1237,6 @@ interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
 	sizes?: string | undefined;
 	type?: string | undefined;
 	charSet?: string | undefined;
-
-	// React props
-	precedence?: string | undefined;
 }
 
 interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1473,7 +1469,6 @@ interface SVGAttributes<T> extends AriaAttributes, DOMAttributes<T> {
 
 	// Attributes which also defined in HTMLAttributes
 	// See comment in SVGDOMPropertyConfig.js
-	className?: string | undefined;
 	color?: string | undefined;
 	height?: number | string | undefined;
 	id?: string | undefined;

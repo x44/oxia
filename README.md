@@ -38,15 +38,6 @@ function Component() {
 }
 ```
 
-## Class attribute
-Using `className` is not required. Just use `class` - and/or `className`.
-
-``` tsx
-function Component() {
-	return <div class="some"></div>
-}
-```
-
 ## Style tags in JSX code
 Style tags in JSX code do not require to be template literals - no `{``}` is required and CSS completions are available. Further, you can use navigable TypeScript code in style tags (see below). Please note, that the CSS code of style tags in JSX code gets inlined and is **not scoped**.
 ```tsx

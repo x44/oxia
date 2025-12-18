@@ -22,29 +22,29 @@ describe(`html-${ID}`, () => {
 
 			function gen1() {
 				const r = [
-					<div className="div">1/0</div>,
-					<div className="div">1/1</div>,
+					<div class="div">1/0</div>,
+					<div class="div">1/1</div>,
 				];
 				return r;
 			}
 
 			function gen2() {
 				const r = [
-					<div className="div">2{ gen3() }</div>
+					<div class="div">2{ gen3() }</div>
 				];
 				return r;
 			}
 
 			function gen3() {
 				return (
-					<div className="div">3{ gen4() }</div>
+					<div class="div">3{ gen4() }</div>
 				)
 			}
 
 			function gen4() {
 				return [
-					[<div className="div">4/0</div>, <div className="div">4/1</div>],
-					[<div className="div">4/2</div>, <div className="div">4/3</div>],
+					[<div class="div">4/0</div>, <div class="div">4/1</div>],
+					[<div class="div">4/2</div>, <div class="div">4/3</div>],
 				];
 			}
 		`;
