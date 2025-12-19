@@ -4,7 +4,7 @@ import { writeTextFile } from "../../util/fs.js";
 import { Log } from "../../util/log.js";
 import { Timings } from "../../util/timings.js";
 import type { RouteFile } from "../file/file.js";
-import toHtml from "./toHtml.js";
+import toHtml from "./temp-toHtml.js";
 
 export async function tsx2html(options: ResolvedOptions, file: RouteFile) {
 	Log.debug(`tsx2html ${file.oxiaAbsPath}`);
