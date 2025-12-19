@@ -96,14 +96,15 @@ export class Project {
 	private createTsconfigJson() {
 		if (this.tsconfigJson) return this.tsconfigJson;
 		this.tsconfigJson = {
-			"compilerOptions": {
-				"types": [
+			compilerOptions: {
+				lib: ["ESNext", "DOM"],
+				types: [
 					"oxia",
 				],
-				"jsx": "react",
-				"noEmit": true,
+				jsx: "react",
+				noEmit: true,
 			}
-		}
+		};
 		return this.tsconfigJson;
 	}
 
