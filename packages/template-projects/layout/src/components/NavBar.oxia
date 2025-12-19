@@ -1,0 +1,29 @@
+import NavLink from "./NavLink.oxia";
+
+export const Routes = {
+	"index": {
+		path: "/",
+		title: "Home",
+	},
+	"about": {
+		path: "/about/",
+		title: "About",
+	},
+} as const satisfies { [key: string]: { path: string; title: string; } };
+
+export type Route = keyof typeof Routes;
+
+export default function NavBar({ route }: { route: Route }) {
+	return (
+		<nav>
+			{ Object.keys(Routes).map(id => <NavLink active={route === id} path={Routes[id].path} title={Routes[id].title}></NavLink>) }
+		</nav>
+	)
+}
+
+<style is:global>
+nav {
+	display: flex;
+	gap: 32px;
+}
+</style>

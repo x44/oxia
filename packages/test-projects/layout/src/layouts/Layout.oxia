@@ -1,0 +1,31 @@
+import NavBar, { Route, Routes } from "../components/NavBar.oxia";
+
+export default function Layout({ route }: { route: Route }) {
+	return (
+		<html>
+			<head>
+				<meta charset="UTF-8" />
+				<meta name="viewport" content="width=device-width" />
+				<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+				<title>{Routes[route].title}</title>
+			</head>
+			<body>
+				<NavBar route={route}></NavBar>
+				<slot />
+			</body>
+		</html>
+	)
+}
+
+<style is:global>
+* {
+	box-sizing: border-box;
+}
+html,
+body {
+	padding: 0;
+	margin: 0;
+	background-color: #000010;
+	color: #e0e0e0;
+}
+</style>

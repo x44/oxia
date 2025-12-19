@@ -1,0 +1,9 @@
+import Layout from "../layouts/Layout.oxia";
+
+export default function index() {
+	return (
+		<Layout route="about">
+			<h1>About</h1>
+		</Layout>
+	)
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@test-projects/layout",
+  "version": "0.0.0",
+  "author": "x44",
+  "license": "MIT",
+  "private": true,
+  "description": "Simple layout and routes",
+  "scripts": {
+    "dev": "oxia dev",
+    "dev-ext": "pnpm --filter oxia run watch",
+    "build": "oxia build"
+  },
+  "dependencies": {
+    "oxia": "workspace:*"
+  }
+}

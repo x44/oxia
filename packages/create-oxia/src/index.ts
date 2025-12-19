@@ -58,7 +58,7 @@ function getTemplateMetas() {
 		{
 			id: "empty",
 			name: "Empty",
-			description: "Creates a nearly empty project",
+			description: "A nearly empty project",
 		},
 		...templateDirs.map(templateDir => readTemplateMeta(absPath(templatesDir, templateDir)))
 	];

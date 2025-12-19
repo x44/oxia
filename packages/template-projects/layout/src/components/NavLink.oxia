@@ -1,0 +1,22 @@
+type Props = {
+	path: string;
+	title: string;
+	active: boolean;
+}
+
+export default function NavLink({ path, title, active }: Props) {
+	return <a class={active && "active"} href={path}>{title}</a>
+}
+
+<style>
+a {
+	color: #e0e0e0;
+	padding: 4px 8px;
+	text-decoration: none;
+}
+a.active {
+	color: #000010;
+	background-color: #e0e0e0;
+	pointer-events: none;
+}
+</style>

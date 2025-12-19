@@ -171,6 +171,12 @@ importers:
         specifier: ^4.0.15
         version: 4.0.15(@types/node@25.0.1)(jsdom@27.3.0(postcss@8.5.6))
 
+  packages/template-projects/layout:
+    dependencies:
+      oxia:
+        specifier: workspace:*
+        version: link:../../oxia
+
   packages/template-projects/minimal:
     dependencies:
       oxia:
@@ -190,6 +196,12 @@ importers:
         version: link:../../oxia
 
   packages/test-projects/inline-style:
+    dependencies:
+      oxia:
+        specifier: workspace:*
+        version: link:../../oxia
+
+  packages/test-projects/layout:
     dependencies:
       oxia:
         specifier: workspace:*
