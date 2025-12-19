@@ -1,9 +1,13 @@
 {
-	"compilerOptions": {
-		"types": [
-			"oxia",
-		],
-		"jsx": "react",
-		"noEmit": true,
-	},
+  "compilerOptions": {
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "types": [
+      "oxia"
+    ],
+    "jsx": "react",
+    "noEmit": true
+  },
 }
