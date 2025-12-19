@@ -34,6 +34,7 @@ function startBuilding() {
 	if (initBuilding()) {
 		// The calling script is the first caller, so let it handle building
 		runBuild();
+		return true;
 	} else {
 		// The calling script is not the first caller
 		const interval = setInterval(() => {
@@ -43,6 +44,7 @@ function startBuilding() {
 				clearInterval(interval);
 			}
 		}, 1000);
+		return false;
 	}
 }
 
@@ -78,8 +80,12 @@ async function runBuild() {
 	tscWatch.start("-p", "tsconfig.build.json", "--compileCommand", "tsgo", "--noClear", "--silent");
 }
 
-async function startWatching() {
-	touchFile(doneFile);
+async function startWatching(isFirst: boolean) {
+	if (isFirst) {
+		touchFile(doneFile);
+	} else {
+		execCallback();
+	}
 	const watcher = chokidar.watch(doneFile);
 	watcher.on("ready", () => {
 		watcher.on("change", execCallback);
@@ -118,5 +124,5 @@ function killCallback(callbackProcess: ChildProcessWithoutNullStreams) {
 	callbackProcess = undefined;
 }
 
-startBuilding();
-startWatching();
+const isFirst = startBuilding();
+startWatching(isFirst);
