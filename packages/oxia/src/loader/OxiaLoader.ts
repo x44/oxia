@@ -2,8 +2,7 @@ import { type LoadFnOutput, type LoadHookContext, registerHooks, type ResolveFnO
 import { oxia2tsx } from "../build/oxia2tsx/index.js";
 import type { MemFs } from "../memfs/MemFs.js";
 import { Timings } from "../util/timings.js";
-import { DependencyGraph } from "./DependencyGraph.js";
-import { isProjectFile, resolveSpecifier, specifier2file, toUrl, transpileToJs, url2file, withExtension } from "./loader-util.js";
+import { isProjectFile, resolveSpecifier, toUrl, transpileToJs, url2file, withExtension } from "./loader-util.js";
 
 /** Module loader for oxia files */
 export class OxiaLoader {
@@ -13,10 +12,6 @@ export class OxiaLoader {
 
 	private projectSrcDir: string | undefined = undefined;
 	private timestamp = 0;
-
-	private dependencyGraph = new DependencyGraph();
-
-	private oxiaFileResolvedListener?: (absFile: string) => void;
 
 	constructor(memFs: MemFs) {
 		OxiaLoader.instance = this;
@@ -34,36 +29,20 @@ export class OxiaLoader {
 		});
 	}
 
-	static beforeImport(projectSrcDir: string, timestamp: number) {
+	static invalidateAllFiles(projectSrcDir: string, timestamp: number) {
 		OxiaLoader.instance.projectSrcDir = projectSrcDir;
 		OxiaLoader.instance.timestamp = timestamp;
-		OxiaLoader.instance.dependencyGraph.start();
-	}
-
-	static afterImport() {
-		OxiaLoader.instance.dependencyGraph.purge();
-	}
-
-	static invalidateAll() {
 		OxiaLoader.instance.memFs.clear();
-		OxiaLoader.instance.dependencyGraph.invalidateAll(OxiaLoader.instance.timestamp);
 	}
 
-	static invalidate(changedFiles: string[]) {
+	static invalidateFiles(projectSrcDir: string, timestamp: number, changedFiles: string[]) {
+		OxiaLoader.instance.projectSrcDir = projectSrcDir;
+		OxiaLoader.instance.timestamp = timestamp;
 		OxiaLoader.instance.memFs.removeFiles(changedFiles);
-		OxiaLoader.instance.dependencyGraph.invalidate(changedFiles, OxiaLoader.instance.timestamp);
-	}
-
-	static isInvalid(absFile: string) {
-		return OxiaLoader.instance.dependencyGraph.isInvalid(absFile);
-	}
-
-	static setOxiaFileResolvedListener(oxiaFileResolvedListener: ((absFile: string) => void) | undefined) {
-		OxiaLoader.instance.oxiaFileResolvedListener = oxiaFileResolvedListener;
 	}
 
 	private resolve(specifier: string, context: ResolveHookContext, nextResolve: (specifier: string, context?: Partial<ResolveHookContext>) => ResolveFnOutput) {
-		// console.log("OxiaLoader: resolving:", specifier, context.parentURL);
+		// Log.log("OxiaLoader: resolving:", specifier, context.parentURL);
 		const originalSpecifier = specifier;
 
 		specifier = this.importMappings.get(specifier) || specifier;
@@ -76,37 +55,12 @@ export class OxiaLoader {
 			const isFileInProject = isProjectFile(this.projectSrcDir, absFile);
 
 			if (isFileInProject) {
-				let absParentFile = context.parentURL ? specifier2file(context.parentURL) : undefined;
-				const isParentInProject = isProjectFile(this.projectSrcDir, absParentFile);
-				if (!isParentInProject) {
-					absParentFile = undefined;
-				}
-
-				this.dependencyGraph.add(absParentFile, absFile, this.timestamp);
-
-				timestamp = this.dependencyGraph.getTimestamp(absFile);
+				timestamp = this.timestamp;
 			}
 
-			if (absFile.endsWith(".oxia")) {
-
-				if (this.oxiaFileResolvedListener) {
-					this.oxiaFileResolvedListener(absFile);
-				}
-
+			if (absFile.endsWith(".oxia") || absFile.endsWith(".ts") || specifier.endsWith(".tsx")) {
 				const absUrl = toUrl(absFile, timestamp);
-				// console.log("OxiaLoader: resolved:", absUrl);
-
-				return {
-					url: absUrl,
-					format: "module",
-					shortCircuit: true,
-				};
-			}
-
-			if (absFile.endsWith(".ts") || specifier.endsWith(".tsx")) {
-				const absUrl = toUrl(absFile, timestamp);
-				// console.log("OxiaLoader: resolved:", absUrl);
-
+				// Log.log("OxiaLoader: resolved:", absUrl);
 				return {
 					url: absUrl,
 					format: "module",
@@ -119,13 +73,12 @@ export class OxiaLoader {
 	}
 
 	private load(url: string, context: LoadHookContext, nextLoad: (url: string, context?: Partial<LoadHookContext>) => LoadFnOutput) {
-		// console.log("OxiaLoader: loading", url);
-
+		// Log.log("OxiaLoader: loading", url);
 		if (url.startsWith("file:///")) {
 			const file = url2file(url);
 
 			if (file.endsWith(".oxia")) {
-				// console.log("OxiaLoader: loading", url);
+				// Log.log("OxiaLoader: loading", url);
 				const jsCode = loadJsFromOxiaFile(this.memFs, file);
 
 				return {
@@ -137,7 +90,7 @@ export class OxiaLoader {
 			}
 
 			if (file.endsWith(".tsx") || file.endsWith(".ts")) {
-				// console.log("OxiaLoader: loading", url);
+				// Log.log("OxiaLoader: loading", url);
 				const jsCode = loadJsFromTsOrTsxFile(this.memFs, file);
 
 				return {
@@ -154,7 +107,7 @@ export class OxiaLoader {
 }
 
 function loadJsFromOxiaFile(memFs: MemFs, oxiaFilePath: string) {
-	// console.log("loadJsFromOxiaFile", oxiaFilePath);
+	// Log.log("loadJsFromOxiaFile", oxiaFilePath);
 
 	const jsFilePath = withExtension(oxiaFilePath, ".js");
 	if (!memFs.exists(oxiaFilePath)) {
@@ -182,7 +135,7 @@ function loadJsFromOxiaFile(memFs: MemFs, oxiaFilePath: string) {
 }
 
 function loadJsFromTsOrTsxFile(memFs: MemFs, tsOrTsxFilePath: string) {
-	// console.log("loadJsFromTsOrTsxFile", tsOrTsxFilePath);
+	// Log.log("loadJsFromTsOrTsxFile", tsOrTsxFilePath);
 
 	const jsFilePath = withExtension(tsOrTsxFilePath, ".js");
 	if (!memFs.exists(tsOrTsxFilePath)) {

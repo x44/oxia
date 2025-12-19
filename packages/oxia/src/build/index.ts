@@ -11,6 +11,7 @@ import { absPath, copyDir, delDir, relPath, slashify, writeTextFile } from "../u
 import { Log } from "../util/log.js";
 import { Timings } from "../util/timings.js";
 import { initArgs } from "./args.js";
+import { DependencyRegistry } from "./dependencies/dependency-registry.js";
 import { createRouteFile, type RouteFile } from "./file/file.js";
 import { tsx2html, writeErrorHtml } from "./tsx2html/index.js";
 
@@ -53,22 +54,37 @@ function collectRouteFiles(options: ResolvedOptions) {
 }
 
 /** Builds to dist */
-async function build(options: ResolvedOptions) {
+async function build(options: ResolvedOptions, changedFiles: string[] | "all") {
 	const routeFiles = collectRouteFiles(options);
 	if (routeFiles.length === 0) {
 		Log.warn("no route files in", options.paths.routes);
 		return [];
 	}
 
+	for await (const routeFile of routeFiles) {
+		DependencyRegistry.addRoute(routeFile.oxiaAbsPath);
+	}
+
+	// INVALIDATE CHANGED FILES
+	if (changedFiles === "all") {
+		DependencyRegistry.invalidateAllFiles();
+		OxiaLoader.invalidateAllFiles(options.paths.source, new Date().getTime());
+	} else {
+		DependencyRegistry.invalidateFiles(changedFiles);
+		OxiaLoader.invalidateFiles(options.paths.source, new Date().getTime(), changedFiles);
+	}
+
 	const routeFilesBuilt: RouteFile[] = [];
 
 	for await (const routeFile of routeFiles) {
 
-		if (!OxiaLoader.isInvalid(routeFile.oxiaAbsPath)) {
+		if (!DependencyRegistry.routeNeedsValidation(routeFile.oxiaAbsPath)) {
 			continue;
 		}
 
 		Timings.begin(`Building ${routeFile.oxiaRelPath}`);
+
+		DependencyRegistry.validateRoute(routeFile.oxiaAbsPath);
 
 		try {
 			const html = await tsx2html(options, routeFile);
@@ -120,8 +136,6 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 
 	Timings.reset();
 
-	OxiaLoader.beforeImport(options.paths.source, new Date().getTime());
-
 	let ok = true;
 	let routeFilesBuilt: RouteFile[] = [];
 
@@ -138,16 +152,9 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 			cleanDst(options);
 		}
 
-		// INVALIDATE CHANGED FILES
-		if (changedFiles === "all") {
-			OxiaLoader.invalidateAll();
-		} else {
-			OxiaLoader.invalidate(changedFiles);
-		}
-
 		// BUILD
 		try {
-			routeFilesBuilt = await build(options);
+			routeFilesBuilt = await build(options, changedFiles);
 		} catch (err) {
 			Log.error(err);
 			ok = false;
@@ -160,8 +167,6 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 			MemFs.getInstance().dumpToDisk(options);
 		}
 	}
-
-	OxiaLoader.afterImport();
 
 	// COPY
 	if (options.main.cmd === "build") {

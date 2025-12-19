@@ -1,3 +1,4 @@
+import { Log } from "../../util/log.js";
 import { Timings } from "../../util/timings.js";
 import { extractFunctionBlocks, functionBlockFragmentCloseTagToSourceCode, functionBlockFragmentOpenTagToSourceCode, functionBlockToSourceCode } from "./functions.js";
 import { createModule, deleteModule } from "./module-registry.js";
@@ -6,7 +7,7 @@ import { extractStyleBlocks, hideStyleBlocks, processStyleBlocks, styleBlockToSo
 import { SET_STYLE_RESULT_FUNCTION, type FunctionBlock, type StyleBlock } from "./types.js";
 
 export function oxia2tsx(oxiaAbsPath: string, srcCode: string) {
-	// Log.debug(`oxia2tsx ${oxiaAbsPath}`);
+	Log.debug(`oxia2tsx ${oxiaAbsPath}`);
 
 	Timings.begin("oxia2tsx");
 

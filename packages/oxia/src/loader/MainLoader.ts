@@ -24,7 +24,7 @@ export class MainLoader {
 	}
 
 	private resolve(specifier: string, context: ResolveHookContext, nextResolve: (specifier: string, context?: Partial<ResolveHookContext>) => ResolveFnOutput) {
-		// console.log("MainLoader: resolving:", specifier, context.parentURL);
+		// Log.log("MainLoader: resolving:", specifier, context.parentURL);
 		const originalSpecifier = specifier;
 
 		specifier = this.importMappings.get(specifier) || specifier;
@@ -35,7 +35,7 @@ export class MainLoader {
 
 			if (absFile !== undefined) {
 				const absUrl = toUrl(absFile, undefined); // Note that we do *not* timestamp in MainLoader
-				// console.log("MainLoader: resolved:", absUrl);
+				// Log.log("MainLoader: resolved:", absUrl);
 				return {
 					url: absUrl,
 					format: "module",
@@ -52,7 +52,7 @@ export class MainLoader {
 			const file = url2file(url);
 
 			if (file.endsWith(".tsx") || file.endsWith(".ts") || file.endsWith(".oxia")) {
-				// console.log("MainLoader: loading", url);
+				// Log.log("MainLoader: loading", url);
 				const jsCode = loadJsFromTsOrTsxFile(file);
 
 				return {

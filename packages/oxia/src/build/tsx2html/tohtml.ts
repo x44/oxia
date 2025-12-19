@@ -1,6 +1,5 @@
 import { basename, dirname } from "node:path";
 import type { ResolvedOptions } from "../../config/types.js";
-import { OxiaLoader } from "../../loader/OxiaLoader.js";
 import type Element from "../../react/elements/Element.js";
 import { React } from "../../react/react.js";
 import type { BuildProps } from "../../react/types.js";
@@ -12,6 +11,7 @@ import Script from "../../react/components/Script.oxia";
 //@ts-ignore
 import Style from "../../react/components/Style.oxia";
 import { Timings } from "../../util/timings.js";
+import { DependencyRegistry } from "../dependencies/dependency-registry.js";
 import { getGlobalStylesForModules } from "../oxia2tsx/module-registry.js";
 
 export default async function toHtml(options: ResolvedOptions, file: RouteFile) {
@@ -57,20 +57,7 @@ export default async function toHtml(options: ResolvedOptions, file: RouteFile) 
 
 	Timings.begin("import");
 
-	// Collect module file paths for global style look-up
-	const importedModuleSrcFilePathsSet = new Set<string>();
-	const importedModuleSrcFilePaths: string[] = [];
-
-	OxiaLoader.setOxiaFileResolvedListener(absFile => {
-		if (!importedModuleSrcFilePathsSet.has(absFile)) {
-			importedModuleSrcFilePathsSet.add(absFile);
-			importedModuleSrcFilePaths.push(absFile);
-		}
-	});
-
 	const module = await import(fileUrl);
-
-	OxiaLoader.setOxiaFileResolvedListener(undefined);
 
 	Timings.end();
 
@@ -108,7 +95,8 @@ export default async function toHtml(options: ResolvedOptions, file: RouteFile) 
 	if (root) {
 		const styleRegistry = createStyleRegistry(options.build.scopedStyleStrategy);
 
-		const globalStyles = getGlobalStylesForModules(importedModuleSrcFilePaths);
+		const globalStyleModules = DependencyRegistry.getAllRouteDependencyPathsForGlobalStyles(file.oxiaAbsPath);
+		const globalStyles = getGlobalStylesForModules(globalStyleModules);
 		registerGlobalStyle(styleRegistry, globalStyles);
 
 		// root.addDebugInfo();

@@ -1,3 +1,4 @@
+import { DependencyRegistry } from "../../../src/build/dependencies/dependency-registry.js";
 import { createRouteFile, type RouteFile } from "../../../src/build/file/file.js";
 import { defaultOptions, resolveOptions } from "../../../src/build/options/options.js";
 import { tsx2html } from "../../../src/build/tsx2html/index.js";
@@ -50,6 +51,8 @@ export async function runOxia2Html(suiteId: string, testId: string, route: {path
 	if (optionsHandler) optionsHandler(options);
 
 	const routeFile = writeSourceFile(suiteId, testId, `routes/${route.path}.oxia`, route.code);
+
+	DependencyRegistry.addRoute(routeFile.oxiaAbsPath);
 
 	if (components) {
 		for (const component of components) {
