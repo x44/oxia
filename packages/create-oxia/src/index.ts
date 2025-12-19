@@ -298,7 +298,7 @@ function createTsConfigJson(settings: Settings) {
 
 	const content = {
 		compilerOptions: {
-			lib: ["ESNext"],
+			lib: ["ESNext", "DOM"],
 			types: [
 				"oxia",
 			],
