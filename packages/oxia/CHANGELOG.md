@@ -1,5 +1,13 @@
 # oxia
 
+## 0.0.8
+
+### Patch Changes
+
+- cd2de72: Fixed JSX Element[]
+- 7917fc8: Improved build - only building and reloading modified routes
+- 7917fc8: Fixed missing global style in dev mode
+
 ## 0.0.7
 
 ### Patch Changes

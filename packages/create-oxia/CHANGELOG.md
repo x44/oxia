@@ -1,5 +1,11 @@
 # create-oxia
 
+## 0.0.8
+
+### Patch Changes
+
+- cf5cde5: Added layout template
+
 ## 0.0.7
 
 ### Patch Changes

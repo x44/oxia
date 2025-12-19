@@ -1,5 +1,14 @@
 # @test-projects/speed-test
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [cd2de72]
+- Updated dependencies [7917fc8]
+- Updated dependencies [7917fc8]
+  - oxia@0.0.8
+
 ## 0.0.6
 
 ### Patch Changes
