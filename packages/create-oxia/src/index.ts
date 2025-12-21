@@ -4,7 +4,9 @@ import { copyFileSync, existsSync, mkdirSync, readdirSync, realpathSync, statSyn
 import { platform } from "os";
 import { basename, dirname } from "path";
 import { argv } from "process";
-import { InputWidget, MessageWidget, SelectWidget, Task, TaskWidget, Term, WidgetResult } from "./term/term.js";
+import { Term } from "./term/term.js";
+import { appendStyledText, createStyledText, StyledText } from "./term/text.js";
+import { InputWidget, MessageWidget, SelectWidget, Task, TaskWidget, WidgetResult } from "./term/widget.js";
 import { hasHelpArg } from "./util/args.js";
 import { absPath, writeTextFile } from "./util/fs.js";
 import { readTemplateMeta, TemplateMeta } from "./util/meta.js";
@@ -172,7 +174,7 @@ function updateStatusWidget() {
 	if (statusWidget) {
 		statusWidget.erase();
 	}
-	const statusItems = [];
+	const statusItems: StyledText[] = [];
 
 	addStatusItem(statusItems, "Project  ", status.projectName);
 	addStatusItem(statusItems, "Template ", status.templateName);
@@ -185,7 +187,7 @@ function updateStatusWidget() {
 	}
 
 	if (statusItems.length) {
-		statusWidget = new MessageWidget(term, { title: "Settings", items: statusItems });
+		statusWidget = new MessageWidget(term, { title: "Settings", alwaysActive: false, items: statusItems });
 		term.setWidget(statusWidget);
 	}
 }
@@ -196,15 +198,15 @@ function removeStatusWidget() {
 	}
 }
 
-function addStatusItem(statusItems: string[], label: string, value: string | undefined) {
+function addStatusItem(statusItems: StyledText[], label: string, value: string | undefined) {
 	if (value === undefined) return;
-	let s = chalk.white(label);
+	const styledText = createStyledText(label, "normal");
 	if (value.startsWith("ERROR:")) {
-		s += chalk.red(value.substring(6));
+		appendStyledText(styledText, value.substring(6), "error");
 	} else {
-		s += chalk.whiteBright(value);
+		appendStyledText(styledText, value, "primary");
 	}
-	statusItems.push(s);
+	statusItems.push(styledText);
 }
 
 async function inputSettings(settings: Settings) {
@@ -250,7 +252,14 @@ async function inputSettings(settings: Settings) {
 
 		const templateMetas = getTemplateMetas();
 		const maxNameLength = templateMetas.reduce((max, templateMeta) => Math.max(max, templateMeta.name.length), 0);
-		const w = new SelectWidget(term, { title: "Choose Template", autoNewlines: false, multi: false, dir: "ver", items: templateMetas.map(templateMeta => templateMeta.name.padEnd(maxNameLength, " ") + chalk.gray(" " + templateMeta.description)) });
+		const items = templateMetas.map(templateMeta => {
+			const styledText = createStyledText(templateMeta.name.padEnd(maxNameLength, " "), "normal");
+			appendStyledText(styledText, " ", "normal");
+			appendStyledText(styledText, templateMeta.description, "secondary");
+			return styledText;
+		});
+
+		const w = new SelectWidget(term, { title: "Choose Template", autoNewlines: false, multi: false, dir: "ver", items });
 		await term.setWidget(w);
 		w.erase();
 
@@ -261,10 +270,12 @@ async function inputSettings(settings: Settings) {
 	updateStatusWidget();
 
 	{
-		const w = new SelectWidget(term, { title: "Install Dependencies?", autoNewlines: false, multi: false, dir: "hor", items: ["  YES  ", "  NO  "] });
+		const yes = createStyledText("  YES  ", "normal");
+		const no = createStyledText("  NO  ", "normal");
+		const w = new SelectWidget(term, { title: "Install Dependencies?", autoNewlines: false, multi: false, dir: "hor", items: [yes, no] });
 		await term.setWidget(w);
 		w.erase();
-		settings.installDependencies = w.getSelectedItem().trim() === "YES";
+		settings.installDependencies = w.getSelectedItem() === yes;
 
 		updateStatusOptions("Install Dependencies");
 		updateStatusWidget();
@@ -408,17 +419,16 @@ function installDependencies(settings: Settings, task: Task) {
 }
 
 async function create(settings: Settings) {
-
 	const initTask: Task = {
-		text: `Init project  ${chalk.blue(settings.projectName)}`,
+		text: appendStyledText(createStyledText("Init project  ", "normal"), settings.projectName, "primary"),
 		state: "pending",
 	};
 	const copyTask: Task = {
-		text: `Copy template ${chalk.blue(settings.templateMeta.name)}`,
+		text: appendStyledText(createStyledText("Copy template ", "normal"), settings.templateMeta.name, "primary"),
 		state: "pending",
 	};
 	const installDependenciesTask: Task = {
-		text: `Install dependencies with ${settings.packageManager}`,
+		text: createStyledText(`Install dependencies with ${settings.packageManager}`, "normal"),
 		state: "pending",
 	};
 
@@ -446,31 +456,31 @@ async function create(settings: Settings) {
 	showInstructionsOrError(settings, result, taskWidget.getRenderedTextLines());
 }
 
-function showInstructionsOrError(settings: Settings, result: WidgetResult, renderedTaskLines: string[]) {
+function showInstructionsOrError(settings: Settings, result: WidgetResult, renderedTaskLines: StyledText[]) {
 	if (result === "error") {
-		const msgs = [
+		const msgs: StyledText[] = [
 			...renderedTaskLines,
-			``,
-			`${chalk.red("Something didn't go so well!")}`,
+			createStyledText("", "normal"),
+			createStyledText("Something didn't go so well!", "error"),
 		];
 		const messageWidget = new MessageWidget(term, { title: "Error", alwaysActive: true, items: msgs });
 		term.setWidget(messageWidget);
 	} else
 	if (result === "done") {
-		const msgs = [
+		const msgs: StyledText[] = [
 			...renderedTaskLines,
-			``,
-			`You can now run your project with`,
-			``
+			createStyledText("", "normal"),
+			createStyledText("You can now run your project with", "normal"),
+			createStyledText("", "normal"),
 		];
 		if (!settings.isProjectInCwd) {
-			msgs.push(chalk.blue(`cd ${settings.projectName}`));
+			msgs.push(createStyledText(`cd ${settings.projectName}`, "primary"));
 		}
 		if (!settings.installDependencies) {
-			msgs.push(chalk.blue(`${settings.packageManager} install`));
+			msgs.push(createStyledText(`${settings.packageManager} install`, "primary"));
 		}
 		const run = settings.packageManager === "npm" ? " run" : "";
-		msgs.push(chalk.blue(`${settings.packageManager}${run} dev`));
+		msgs.push(createStyledText(`${settings.packageManager}${run} dev`, "primary"));
 
 		const messageWidget = new MessageWidget(term, { title: "Done", alwaysActive: true, items: msgs });
 		term.setWidget(messageWidget);
