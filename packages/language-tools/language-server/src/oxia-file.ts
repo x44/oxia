@@ -11,21 +11,6 @@ export interface OxiaFile extends VirtualCode {
 	embeddedCodes: VirtualCode[];
 }
 
-interface StyleBlock {
-	start: number;                  // *<style attr> xxx </style>
-	end: number;                    // <style attr> xxx </style>*
-
-	tag: string;                    // '<style attr>'
-	tagStart: number;               // *<style attr> xxx </style>
-	tagEnd: number;                 // <style attr>* xxx </style>
-
-	content: string;                // ' xxx '
-	contentStart: number;           // <style attr>* xxx </style>
-	contentEnd: number;             // <style attr> xxx *</style>
-
-	isTypeScript: boolean;			// <style>{`...`}</style>
-}
-
 export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): OxiaFile {
 	const fileId = fileName.replaceAll("\\", "/");
 

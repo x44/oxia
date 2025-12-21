@@ -19,7 +19,7 @@ type StyleSection = Section & {
 	type: "style";
 	subType: StyleSectionSubType;
 	innerPos: number; // Position of first char after the '>' of <style>
-	innerEnd: number;   // Position of '<' of </style>
+	innerEnd: number; // Position of '<' of </style>
 }
 
 /**
