@@ -1,5 +1,12 @@
 # oxia
 
+## 0.0.9
+
+### Patch Changes
+
+- a5bc9a5: Changed ifSlotFilled: and ifSlotEmpty: to ifSlotFilled="" and ifSlotEmpty=""
+- a5bc9a5: Changed <style is:global> to <style global>
+
 ## 0.0.8
 
 ### Patch Changes
