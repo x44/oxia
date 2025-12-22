@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve"
+  },
+  "include": ["**/*", "../../oxia/src/react/jsx.d.ts"]
+}

@@ -1,5 +1,11 @@
 export default function index() {
 	return <div></div>
+
+	<style>
+		div {
+			color: red;
+		}
+	</style>
 }
 
 <style>

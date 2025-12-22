@@ -1,3 +1,4 @@
+import { Range, replaceOutsideOfRanges } from "language-server/src/replace.js";
 import { DocumentMetas } from "./document-meta.js";
 import { blankCommentsAndStrings, findCharBwd, findCharFwd } from "./string.js";
 
@@ -60,12 +61,14 @@ type TsSection = {
  * @returns
  * - a string with the pure CSS content
  * - a string with the pure TSX content
+ * - a string with the pure TSX content of <style></style> tags
  * - a position-sorted array of style sections
  * - a position-sorted array of ts sections
  */
 export function parseDocument(fileId: string, content: string): {
 		cssContent: string,
 		tsxContent: string,
+		tsxTagContent: string | undefined,
 		styleSections: StyleSection[],
 		tsSections: TsSection[]
 } {
@@ -79,9 +82,12 @@ export function parseDocument(fileId: string, content: string): {
 
 	const tsxContent = createTsxContent(fileId, content, styleSections);
 
+	const tsxTagContent = createTsxTagContent(fileId, content, styleSections);
+
 	return {
 		cssContent,
 		tsxContent,
+		tsxTagContent,
 		styleSections,
 		tsSections,
 	};
@@ -439,4 +445,23 @@ function semicolon(c: string) {
 function indexOfRegex(s: string, re: RegExp, position: number) {
 	const ind = (position === 0 ? s : s.slice(position)).search(re);
 	return ind < 0 ? ind : position + ind;
+}
+
+/**
+ * Returns a string that contains the <style ...> and </style> tags only.
+ * Everything else is replaced with semicolons.
+ * Used to create the tsx content which enables completion in <style *HERE*>
+ */
+function createTsxTagContent(fileId: string, content: string, styleSections: StyleSection[]) {
+	if (!styleSections.length) return undefined;
+
+	const styleTagRanges: Range[] = [];
+	for (const styleSection of styleSections) {
+		const { pos: startTagPos, innerPos: startTagEnd } = styleSection;
+		const { innerEnd: endTagPos, end: endTagEnd } = styleSection;
+		styleTagRanges.push({ pos: startTagPos, end: startTagEnd });
+		styleTagRanges.push({ pos: endTagPos, end: endTagEnd });
+	}
+
+	return replaceOutsideOfRanges(content, ";", styleTagRanges);
 }

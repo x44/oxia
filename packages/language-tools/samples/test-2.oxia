@@ -3,6 +3,14 @@ function rand() {
 }
 
 export default function index() {
+	<style>
+		div {
+			color: {`${rand()}`};
+			contentA: "{`${rand()}px`}";
+			color: blue;
+			padding: {`${rand()}px`};
+		}
+	</style>
 	return (
 		<div>
 			<style>
@@ -21,7 +29,8 @@ export default function index() {
 			`}</style>
 		</div>
 	)
-	<style>
+
+	<style global>
 		div {
 			color: {`${rand()}`};
 			contentA: "{`${rand()}px`}";
@@ -29,12 +38,29 @@ export default function index() {
 			padding: {`${rand()}px`};
 		}
 	</style>
-	<style>{`
+	<style is:global>{`
 		div {
-		color: ${};
+			color: ${""};
 			contentB: "${rand()}px";
 			background: orange;
 			margin: ${rand()}px;
 		}
 	`}</style>
 }
+
+<style is:global>
+	div {
+		color: {`${rand()}`};
+		contentA: "{`${rand()}px`}";
+		color: blue;
+		padding: {`${rand()}px`};
+	}
+</style>
+<style slot>{`
+	div {
+		color: ${""};
+		contentB: "${rand()}px";
+		background: orange;
+		margin: ${rand()}px;
+	}
+`}</style>

@@ -1,8 +1,8 @@
 import { Diagnostic, LanguageServiceContext, LanguageServicePlugin, TextEdit } from "@volar/language-service";
+import { modifyDocumentDiagnostics, modifyDocumentFormattingEdits } from "language-server/src/document-util.js";
 import { create as createCssService } from 'volar-service-css';
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentMetas } from "./document-meta.js";
-import { modifyDocumentDiagnostics, modifyDocumentFormattingEdits } from "./document-util.js";
 
 export function create(): LanguageServicePlugin {
 	const cssService = createCssService();

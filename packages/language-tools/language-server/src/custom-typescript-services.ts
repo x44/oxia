@@ -1,8 +1,8 @@
 import { Diagnostic, LanguageServiceContext, LanguageServicePlugin, TextEdit } from "@volar/language-service";
+import { modifyDocumentDiagnostics, modifyDocumentFormattingEdits } from "language-server/src/document-util.js";
 import { create as createTypeScriptServices } from 'volar-service-typescript';
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentMetas } from "./document-meta.js";
-import { modifyDocumentDiagnostics, modifyDocumentFormattingEdits } from "./document-util.js";
 
 export function create(typescript: typeof import("typescript")): LanguageServicePlugin[] {
 	const tsServices = createTypeScriptServices(typescript);
@@ -70,8 +70,10 @@ function modifyDiagnostics(document: TextDocument, originalDiagnostics: Diagnost
 		// Suppress: JSX expressions must have one parent element.ts(2657)
 		if (diagnostic.code === 2657) return false;
 
-		// Suppress: Unreachable code detected.ts(7027) for <style></style>
-		if (diagnostic.code === 7027) {
+		// Suppress for <style>...</style>
+		if (false
+			|| diagnostic.code === 7027 // Unreachable code detected.ts(7027)
+		) {
 			const offset = document.offsetAt(diagnostic.range.start);
 			if (DocumentMetas.isOffsetInStyleBlockRange(fileId, offset)) return false;
 		}

@@ -1,0 +1,26 @@
+function rand() {
+	return Math.random() * 50;
+}
+
+export default function index() {
+	<style>
+	</style>
+	return (
+		<div>
+			<style>
+			</style>
+			<style>{`
+			`}</style>
+		</div>
+	)
+
+	<style>{`
+	`}</style>
+	<style global>
+	</style>
+}
+
+<style global>
+</style>
+<style>{`
+`}</style>
