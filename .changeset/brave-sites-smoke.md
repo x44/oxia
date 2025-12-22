@@ -3,4 +3,4 @@
 "oxia-vscode": patch
 ---
 
-Fixed completions in <style> tags
+Fixed attribute completions in <style> tags
