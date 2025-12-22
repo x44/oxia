@@ -1,5 +1,11 @@
 # oxia-vscode
 
+## 0.0.10
+
+### Patch Changes
+
+- d5e4e6c: Fixed attribute completions in <style> tags
+
 ## 0.0.9
 
 ### Patch Changes

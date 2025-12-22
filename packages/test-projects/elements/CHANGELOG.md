@@ -1,5 +1,13 @@
 # @test-projects/elements
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [a5bc9a5]
+- Updated dependencies [a5bc9a5]
+  - oxia@0.0.9
+
 ## 0.0.7
 
 ### Patch Changes
