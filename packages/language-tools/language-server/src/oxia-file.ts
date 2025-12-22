@@ -94,7 +94,7 @@ export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): O
 		embeddedCodes.push(virtualCode);
 	}
 
-	// Create root for tsSections
+	// Create root
 	return {
 		id: "root",
 		languageId: "typescriptreact",
