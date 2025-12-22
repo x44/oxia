@@ -210,14 +210,9 @@ function addStyleToFunction(func: FunctionInfo, style: StyleInfo, add = false) {
 	}
 
 	if (add) {
-		// TODO inherit - is this final? should we keep it? needs improvement?
-		if (!style.attributes.has("inherit")) {
-			// remove all styles we inherited so far
-			func.styles = [];
-			func.styleIds = [];
-		}
-		func.styles.push(style);
-		func.styleIds.push(style.styleId);
+		// remove all styles we inherited so far
+		func.styles = [style];
+		func.styleIds = [style.styleId];
 	}
 
 	for (const childFunc of func.children) {
