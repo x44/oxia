@@ -121,43 +121,4 @@ export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): O
 		],
 		embeddedCodes,
 	};
-
-// TODO remove
-	// // Create root for tsSections
-	// const sourceOffsets: number[] = [];
-	// const generatedOffsets: number[] = [];
-	// const lengths: number[] = [];
-
-	// for (const tsSection of tsSections) {
-	// 	sourceOffsets.push(tsSection.pos);
-	// 	generatedOffsets.push(tsSection.pos);
-	// 	lengths.push(tsSection.end - tsSection.pos);
-	// }
-
-	// return {
-	// 	id: "root",
-	// 	languageId: "typescriptreact",
-	// 	snapshot: {
-	// 		getText: (start, end) => tsxContent.substring(start, end),
-	// 		getLength: () => tsxContent.length,
-	// 		getChangeRange: () => undefined,
-	// 	},
-	// 	mappings: [
-	// 	{
-	// 		sourceOffsets,
-	// 		generatedOffsets,
-	// 		lengths,
-
-	// 		data: {
-	// 			verification: true,
-	// 			completion: true,
-	// 			semantic: true,
-	// 			navigation: true,
-	// 			structure: true,
-	// 			format: true,
-	// 		}
-	// 	}
-	// 	],
-	// 	embeddedCodes,
-	// };
 }
