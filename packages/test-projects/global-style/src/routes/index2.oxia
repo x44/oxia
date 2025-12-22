@@ -22,14 +22,14 @@ export default function index() {
 }
 
 
-<style is:global>
+<style global>
 body {
 	background-color: #ffffff;
 	color: magenta;
 }
 </style>
 
-<style is:global>
+<style global>
 span {
 	background-color: #000000;
 	color: cyan;

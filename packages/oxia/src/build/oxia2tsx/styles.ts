@@ -33,7 +33,7 @@ export function extractStyleBlocks(srcCode: string): StyleBlock[] {
 
 		const fixedId = attributes.get("data-oxia-sid");
 
-		const global = attributes.has("is:global");
+		const global = attributes.has("global");
 
 		let slotName = attributes.get("slot");
 		if (slotName !== undefined) {

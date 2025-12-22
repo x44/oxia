@@ -1,49 +1,32 @@
+function func() {
+
+}
+
 function Component() {
 	return (
-		<div></div>
+		<div>
+			<span>Component</span>
+			<slot></slot>
+			<div ifSlotEmpty>
+				DIV
+			</div>
+		</div>
 	)
+
+	<style slot="default">
+		span {
+			color: orange;
+		}
+	</style>
+}
+
+function Child() {
+	return <span>Child</span>
 }
 
 export default function index() {
 	return (
-		genContainer(5, 3)
+		<Component><span>Hello</span></Component>
+		<Component><Child></Child></Component>
 	)
 }
-
-function genContainer(cols: number, rows: number) {
-	return <div class="container" style={`width: ${cols * 32}px; height: ${rows * 32}px`}>{ genBox(cols, rows) }</div>
-}
-
-function genBox(cols: number, rows: number) {
-	const r = [];
-	for (let row = 0; row < rows; ++row) {
-		for (let col = 0; col < cols; ++col) {
-			r.push(<div class="box" style={`left: ${col * 32}px; top: ${row * 32}px;`}>{`${col}/${row}`}</div>);
-		}
-	}
-	return r;
-}
-
-
-<style>
-.container {
-	position: relative;
-	border: 2px solid white;
-	box-sizing: content-box;
-}
-.box {
-	box-sizing: border-box;
-	position: absolute;
-	display: block;
-	border: 2px solid gray;
-	width: 32px;
-	height: 32px;
-}
-</style>
-
-<style is:global>
-body {
-	background: #000010;
-	color: #e0e0e0;
-}
-</style>

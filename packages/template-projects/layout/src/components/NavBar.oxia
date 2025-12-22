@@ -21,7 +21,7 @@ export default function NavBar({ route }: { route: Route }) {
 	)
 }
 
-<style is:global>
+<style global>
 nav {
 	display: flex;
 	gap: 32px;

@@ -38,7 +38,7 @@ export default function index() {
 			padding: {`${rand()}px`};
 		}
 	</style>
-	<style is:global>{`
+	<style global>{`
 		div {
 			color: ${""};
 			contentB: "${rand()}px";
@@ -48,7 +48,7 @@ export default function index() {
 	`}</style>
 }
 
-<style is:global>
+<style global>
 	div {
 		color: {`${rand()}`};
 		contentA: "{`${rand()}px`}";

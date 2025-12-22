@@ -22,7 +22,7 @@ export default function index() {
 }
 
 
-<style is:global>
+<style global>
 body {
 	font-family: monospace;
 	background-color: #402000;

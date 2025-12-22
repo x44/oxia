@@ -290,10 +290,10 @@ function Parent() {
 
 
 ## Global Styles
-Use the `is:global` attribute to create global styles. Note that this only applies to styles at the module level - function level styles with `is:global` are silently ignored.
+Use the `global` attribute to create global styles. Note that this only applies to styles at the module level - function level styles with `global` are silently ignored.
 
 ```tsx
-<style is:global>
+<style global>
 ...
 <style>
 ```

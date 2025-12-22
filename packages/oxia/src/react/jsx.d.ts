@@ -60,7 +60,7 @@ interface IntrinsicHTMLElements {
 	i: HTMLAttributes<HTMLElement>;
 	iframe: IframeHTMLAttributes<HTMLIFrameElement>;
 	img: ImgHTMLAttributes<HTMLImageElement>;
-	input: HTMLAttributes<HTMLInputElement>;
+	input: InputHTMLAttributes<HTMLInputElement>;
 	ins: InsHTMLAttributes<HTMLModElement>;
 	kbd: HTMLAttributes<HTMLElement>;
 	keygen: KeygenHTMLAttributes<HTMLUnknownElement>;
@@ -726,8 +726,9 @@ interface DOMAttributes<T> {
 interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
 	// Oxia-specific Attributes
 	class?: string | undefined;
-	ifSlotFilled?: boolean | undefined;
-	ifSlotEmpty?: boolean | undefined;
+	ifSlotFilled?: string | boolean | undefined;
+	ifSlotEmpty?: string | boolean | undefined;
+// TODO
 	[key: `ifSlotFilled:${string}`]: boolean | undefined;
 	[key: `ifSlotEmpty:${string}`]: boolean | undefined;
 
@@ -1368,10 +1369,13 @@ interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
 }
 
 interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
-	blocking?: "render" | (string & {}) | undefined;
-	media?: string | undefined;
-	scoped?: boolean | undefined;
-	type?: string | undefined;
+	// Oxia-specific Attributes
+// TODO
+	global?: boolean;
+	// slot?: boolean | string | undefined;
+// TODO keep this?
+	inherit?: boolean;
+	// blocking?: "render" | (string & {}) | undefined;
 }
 
 interface TableHTMLAttributes<T> extends HTMLAttributes<T> {

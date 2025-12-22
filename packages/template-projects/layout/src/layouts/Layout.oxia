@@ -17,7 +17,7 @@ export default function Layout({ route }: { route: Route }) {
 	)
 }
 
-<style is:global>
+<style global>
 * {
 	box-sizing: border-box;
 }
