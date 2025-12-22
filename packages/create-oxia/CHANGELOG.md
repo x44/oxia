@@ -1,5 +1,11 @@
 # create-oxia
 
+## 0.0.9
+
+### Patch Changes
+
+- 6ba8810: Updated templates and style
+
 ## 0.0.8
 
 ### Patch Changes
