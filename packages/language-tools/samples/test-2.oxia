@@ -30,7 +30,7 @@ export default function index() {
 		</div>
 	)
 
-	<style global>
+	<style>
 		div {
 			color: {`${rand()}`};
 			contentA: "{`${rand()}px`}";

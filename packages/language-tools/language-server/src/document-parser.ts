@@ -63,20 +63,16 @@ type TsSection = {
  * - a string with the pure TSX content
  * - a string with the pure TSX content of <style></style> tags
  * - a position-sorted array of style sections
- * - a position-sorted array of ts sections
  */
 export function parseDocument(fileId: string, content: string): {
 		cssContent: string,
 		tsxContent: string,
-		tsxTagContent: string | undefined,
+		tsxTagContent: string,
 		styleSections: StyleSection[],
-		tsSections: TsSection[]
 } {
 	const contentNoCommentsEmptyStrings = blankCommentsAndStrings(content);
 
 	const styleSections = parseStyleSections(contentNoCommentsEmptyStrings, content);
-
-	const tsSections = parseTsSections(content, styleSections);
 
 	const cssContent = createCssContent(fileId, content, styleSections);
 
@@ -89,7 +85,6 @@ export function parseDocument(fileId: string, content: string): {
 		tsxContent,
 		tsxTagContent,
 		styleSections,
-		tsSections,
 	};
 }
 
@@ -243,48 +238,6 @@ function addTsStyleSection(sections: Section[], pos: number, end: number, innerP
 	};
 	sections.push(section);
 	return section;
-}
-
-function parseTsSections(content: string, styleSections: StyleSection[]) {
-	const tsSections: TsSection[] = [];
-
-	let pos = 0;
-	for (const styleSection of styleSections) {
-		if (styleSection.pos > pos) {
-			tsSections.push({
-				pos: pos,
-				end: styleSection.pos,
-			});
-		}
-
-		if (styleSection.subType === "css") {
-			const cssStyleSection = styleSection as CssStyleSection;
-			for (const tsCurlySection of cssStyleSection.tsCurlySections) {
-				tsSections.push({
-					pos: tsCurlySection.pos,
-					end: tsCurlySection.end,
-				});
-			}
-		} else
-		if (styleSection.subType === "ts") {
-			const tsStyleSection = styleSection as TsStyleSection;
-			tsSections.push({
-				pos: tsStyleSection.innerPos,
-				end: tsStyleSection.innerEnd,
-			});
-		}
-
-		pos = styleSection.end;
-	}
-
-	if (pos < content.length) {
-		tsSections.push({
-			pos: pos,
-			end: content.length,
-		});
-	}
-
-	return tsSections;
 }
 
 /**
@@ -453,7 +406,7 @@ function indexOfRegex(s: string, re: RegExp, position: number) {
  * Used to create the tsx content which enables completion in <style *HERE*>
  */
 function createTsxTagContent(fileId: string, content: string, styleSections: StyleSection[]) {
-	if (!styleSections.length) return undefined;
+	if (!styleSections.length) return "";
 
 	const styleTagRanges: Range[] = [];
 	for (const styleSection of styleSections) {

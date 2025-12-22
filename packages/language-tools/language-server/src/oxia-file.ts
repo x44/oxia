@@ -18,7 +18,7 @@ export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): O
 
 	const content = snapshot.getText(0, snapshot.getLength());
 
-	const { cssContent, tsxContent, tsxTagContent, styleSections, tsSections } = parseDocument(fileId, content);
+	const { cssContent, tsxContent, tsxTagContent, styleSections } = parseDocument(fileId, content);
 
 	// console.log("----------------------------- TSX ----------------------------------");
 	// console.log(tsxContent);
@@ -27,14 +27,15 @@ export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): O
 	const embeddedCodes: VirtualCode[] = [];
 
 	// Virtual css codes for style sections' inner content: <style ...>*THIS*</style>
-	let cssInd = 0;
-	for (const styleSection of styleSections) {
+	for (let i = 0; i < styleSections.length; ++i) {
+		const styleSection = styleSections[i];
 
 		const isRealCss = styleSection.subType === "css";
 
 		const { innerPos, innerEnd } = styleSection;
+
 		const virtualCode: VirtualCode = {
-			id: `css_${cssInd}`,
+			id: `css_${i}`,
 			languageId: "css",
 			snapshot: {
 				getText: (start, end) => cssContent.substring(innerPos + start, innerPos + end),
@@ -61,25 +62,28 @@ export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): O
 			embeddedCodes: [],
 		};
 		embeddedCodes.push(virtualCode);
-
-		++cssInd;
 	}
 
-	// Virtual tsx code for style tags: <style ...></style>
+
+	// Virtual tsx code for style start and end tags: <style ...> </style>
 	// This enables code completion in tags: <style *HERE*>
-	if (tsxTagContent !== undefined) {
+	for (let i = 0; i < styleSections.length; ++i) {
+		const styleSection = styleSections[i];
+
+		const { pos: startTagPos, end: endTagEnd } = styleSection;
+
 		const virtualCode: VirtualCode = {
-			id: `tsx_tags`,
+			id: `style_tag_${i}`,
 			languageId: "typescriptreact",
 			snapshot: {
-				getText: (start, end) => tsxTagContent.substring(start, end),
-				getLength: () => tsxTagContent.length,
+				getText: (start, end) => tsxTagContent.substring(startTagPos + start, startTagPos + end),
+				getLength: () => endTagEnd - startTagPos,
 				getChangeRange: () => undefined,
 			},
 			mappings: [{
-				sourceOffsets: [0],
+				sourceOffsets: [startTagPos],
 				generatedOffsets: [0],
-				lengths: [tsxTagContent.length],
+				lengths: [endTagEnd - startTagPos],
 				data: {
 					verification: true,
 					completion: true,
@@ -93,6 +97,7 @@ export function parseOxiaFile(fileName: string, snapshot: ts.IScriptSnapshot): O
 		};
 		embeddedCodes.push(virtualCode);
 	}
+
 
 	// Create root
 	return {
