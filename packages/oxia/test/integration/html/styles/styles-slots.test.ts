@@ -79,7 +79,57 @@ describe(`html-${ID}`, () => {
 
 {
 	const testId = getTestId();
-	test(`${testId} ` + "should be div data-oxia-sid-a with inner div data-oxia-sid-b", async () => {
+	test(`${testId} ` + "should be div data-oxia-sid-a with inner div data-oxia-sid-b (no slotname)", async () => {
+		const routeCode = `
+		function Component() {
+			return <slot/>
+			<style></style>
+			<style slot></style>
+		}
+		export default function Index() {
+			return <div><Component><div>Child</div></Component></div>
+		}
+		<style></style>
+		`;
+
+		const expected = `<div data-oxia-sid-a><div data-oxia-sid-b>Child</div></div>`;
+		const actual = await runOxia2Html(ID, testId, {path: "index", code: routeCode});
+		expect(
+			getDiffableHTML(actual)
+		).toBe(
+			getDiffableHTML(expected)
+		);
+	});
+}
+
+{
+	const testId = getTestId();
+	test(`${testId} ` + "should be div data-oxia-sid-a with inner div data-oxia-sid-b (empty slotname)", async () => {
+		const routeCode = `
+		function Component() {
+			return <slot/>
+			<style></style>
+			<style slot=""></style>
+		}
+		export default function Index() {
+			return <div><Component><div>Child</div></Component></div>
+		}
+		<style></style>
+		`;
+
+		const expected = `<div data-oxia-sid-a><div data-oxia-sid-b>Child</div></div>`;
+		const actual = await runOxia2Html(ID, testId, {path: "index", code: routeCode});
+		expect(
+			getDiffableHTML(actual)
+		).toBe(
+			getDiffableHTML(expected)
+		);
+	});
+}
+
+{
+	const testId = getTestId();
+	test(`${testId} ` + "should be div data-oxia-sid-a with inner div data-oxia-sid-b (default slotname)", async () => {
 		const routeCode = `
 		function Component() {
 			return <slot/>

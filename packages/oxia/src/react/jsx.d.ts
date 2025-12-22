@@ -728,9 +728,6 @@ interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
 	class?: string | undefined;
 	ifSlotFilled?: string | boolean | undefined;
 	ifSlotEmpty?: string | boolean | undefined;
-// TODO
-	[key: `ifSlotFilled:${string}`]: boolean | undefined;
-	[key: `ifSlotEmpty:${string}`]: boolean | undefined;
 
 	// Standard HTML Attributes
 	accessKey?: string | undefined;
@@ -1368,14 +1365,10 @@ interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
 	width?: number | string | undefined;
 }
 
-interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
+interface StyleHTMLAttributes<T> extends Omit<HTMLAttributes<T>, "slot"> {
 	// Oxia-specific Attributes
-// TODO
 	global?: boolean;
-	// slot?: boolean | string | undefined;
-// TODO keep this?
-	inherit?: boolean;
-	// blocking?: "render" | (string & {}) | undefined;
+	slot?: boolean | string | undefined;
 }
 
 interface TableHTMLAttributes<T> extends HTMLAttributes<T> {

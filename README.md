@@ -292,15 +292,26 @@ function Parent() {
 ## Global Styles
 Use the `global` attribute to create global styles. Note that this only applies to styles at the module level - function level styles with `global` are silently ignored.
 
-```tsx
-<style global>
-...
-<style>
+```html
+<style global> ... </style>
 ```
 
 
 ## Styling Slotted Content
-In some cases, it may be useful to change the style of a component depending on the DOM hierarchy. For example, buttons with rounded edges may not look appealing when added to a button group where the buttons are arranged side by side. In this case, it would be nice if the button group had a way to style it's content:
+Use the `slot` attribute to style slotted components:
+```html
+<style slot="slot-name"> ... </style>
+```
+
+To style components in the default slot, the slot-name can either be omitted, empty or "default":
+```html
+<style slot></style>
+<style slot=""></style>
+<style slot="default"></style>
+```
+
+
+This feature is useful if you want to change the style of a component depending on the DOM hierarchy. For example, buttons with rounded edges may not look appealing when added to a button group where the buttons are arranged side by side. In this case, it would be nice if the button group had a way to style it's content:
 
 Button.oxia
 ```tsx
@@ -482,13 +493,32 @@ export default function index() {
 ```
 
 ## Conditional Rendering
-Components can render their content depending on whether a slot is filled (`ifSlotFilled:`) or empty (`ifSlotEmpty:`):
+Components can render their content depending on whether a slot is filled (`ifSlotFilled`) or empty (`ifSlotEmpty`):
+
+```html
+<slot name="the-slot-name"></slot>
+
+<!-- This div only renders if slot "the-slot-name" is filled -->
+<div ifSlotFilled="the-slot-name"></div>
+
+<!-- This div only renders if slot "the-slot-name" is empty -->
+<div ifSlotEmpty="the-slot-name"></div>
+```
+
+To address the default slot, the slot-name can either be omitted, empty or "default":
+```html
+<div ifSlotFilled></div>
+<div ifSlotFilled=""></div>
+<div ifSlotFilled="default"></div>
+```
+
+Example:
 ```tsx
 function Component() {
 	return (
 		<slot name="empty"></slot>
 
-		<div ifSlotFilled:empty>
+		<div ifSlotFilled="empty">
 			This div will not be rendered.
 			<span>
 				Nor will this span.
@@ -497,7 +527,7 @@ function Component() {
 
 		<slot name="filled"></slot>
 
-		<div ifSlotFilled:filled>
+		<div ifSlotFilled="filled">
 			...this div will be rendered.
 			<span>
 				And this span, too.
@@ -519,7 +549,7 @@ This can be used to toggle the display of single elements or whole element struc
 ```tsx
 function Component() {
 	return (
-		<div ifSlotFilled:default>
+		<div ifSlotFilled>
 			<div>
 				The slotted content
 				<div>
@@ -528,7 +558,7 @@ function Component() {
 			</div>
 		</div>
 
-		<span ifSlotEmpty:default>Just a span</span>
+		<span ifSlotEmpty>Just a span</span>
 	)
 }
 

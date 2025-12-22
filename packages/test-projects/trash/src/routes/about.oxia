@@ -1,0 +1,44 @@
+function Component() {
+	return (
+		<div ifSlotFilled>
+			<div>
+				The slotted content
+				<div>
+					<slot name="default"></slot>
+				</div>
+			</div>
+		</div>
+		<span ifSlotEmpty>Just a span</span>
+
+		<div ifSlotFilled="">
+			<div>
+				The slotted content
+				<div>
+					<slot name="default"></slot>
+				</div>
+			</div>
+		</div>
+		<span ifSlotEmpty="">Just a span</span>
+
+		<div ifSlotFilled="default">
+			<div>
+				The slotted content
+				<div>
+					<slot name="default"></slot>
+				</div>
+			</div>
+		</div>
+		<span ifSlotEmpty="default">Just a span</span>
+	)
+}
+
+export default function index() {
+	return (
+		<Component>
+			<div>is so happy to be in these cosy divs!</div>
+		</Component>
+
+		<Component>
+		</Component>
+	)
+}

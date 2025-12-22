@@ -19,45 +19,6 @@ type AttributeValue =
 | boolean
 | Function
 
-
-/**
- * ***Render Condition "ifSlotFilled" and "ifSlotEmpty"***
- *
- * Renders elements if any slot in the component has/not has content.
- *
- * Implemented as element attributes. Available on all levels:
- * - Intrinsic elements
- * - Component root elements
- * - Fragments (must use \<fragment\>, \<\> does not allow attributes)
- *
- * @example
- * <div ifSlotFilled:more></div>
- * <div ifSlotEmpty:more></div>
- *
- * // Condition on parts of the component:
- * export default function MyComponent() {
- *     return (
- *         <>
- *             <div>This is always rendered</div>
- *             <div ifSlotFilled:more>
- *                 <div>Here is more:</div>
- *                 <div><slot name="more"/></div>
- *             </div>
- *         </>
- *     )
- * }
- *
- * // Condition on the whole component:
- * export default function MyComponent() {
- *     return (
- *         <fragment ifSlotFilled:more>
- *             <div>Here is more:</div>
- *             <div><slot name="more"/></div>
- *         </fragment>
- *     )
- * }
- *
- */
 type RenderCondition = () => boolean;
 
 const VoidTags = new Set<string>([
@@ -229,27 +190,23 @@ export default class Element {
 	}
 
 	private storePropsAsAttributes(props: ElementProps) {
-
-		// Props to filter:
-		// ifSlotFilled:<slotName>
-		// ifSlotEmpty:<slotName>
-
 		const keys = Object.keys(props);
 		for (const key of keys) {
 
 			// Filter special props
-			if (key.startsWith("ifSlotFilled:") || key.startsWith("ifSlotEmpty:")) {
 
-				const slotName = this.toSlotName(key.substring(key.indexOf(":") + 1));
-				const negate = key.startsWith("ifSlotEmpty:");
+			if (key === "ifSlotFilled" || key === "ifSlotEmpty") {
+				const slotName = this.toSlotName(typeof props[key] === "boolean" ? "" : props[key]);
+				const negate = key === "ifSlotEmpty";
 
 				this.addRenderCondition(() => {
 					return this.ifSlotFilledContent(slotName, negate);
 				});
-
-				delete props.key;
+				delete props[key];
 				continue;
 			}
+
+			// Other props
 
 			const val = props[key];
 			this.attributes.push({
