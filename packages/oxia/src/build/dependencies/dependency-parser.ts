@@ -48,7 +48,7 @@ function resolveImportPaths(importerPath: string, importPaths: string[]) {
 		if (exists) {
 			resolvedPaths.push(resolvedPath.replaceAll("\\", "/"));
 		} else {
-			Log.warn("import not exists", importPath, "imported from", importerPath);
+			// Log.warn("import not exists", importPath, "imported from", importerPath);
 		}
 	}
 	return resolvedPaths;
