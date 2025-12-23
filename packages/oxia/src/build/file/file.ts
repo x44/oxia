@@ -38,6 +38,11 @@ export type RouteFile = BuildFile & {
 	htmlAbsPath: string;
 }
 
+export type RouteFileBuildResult = {
+	routeFile: RouteFile;
+	error?: Error;
+}
+
 export function createBuildFile(options: ResolvedOptions, oxiaFilePath: string): BuildFile {
 	const paths = options.paths;
 

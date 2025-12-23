@@ -12,7 +12,7 @@ import { Log } from "../util/log.js";
 import { Timings } from "../util/timings.js";
 import { initArgs } from "./args.js";
 import { DependencyRegistry } from "./dependencies/dependency-registry.js";
-import { createRouteFile, type RouteFile } from "./file/file.js";
+import { createRouteFile, type RouteFileBuildResult } from "./file/file.js";
 import { tsx2html, writeErrorHtml } from "./tsx2html/index.js";
 
 type ChangeType = "sources" | "static" | "all";
@@ -74,7 +74,7 @@ async function build(options: ResolvedOptions, changedFiles: string[] | "all") {
 		OxiaLoader.invalidateFiles(options.paths.source, new Date().getTime(), changedFiles);
 	}
 
-	const routeFilesBuilt: RouteFile[] = [];
+	const routeFileBuildResults: RouteFileBuildResult[] = [];
 
 	for await (const routeFile of routeFiles) {
 
@@ -86,21 +86,31 @@ async function build(options: ResolvedOptions, changedFiles: string[] | "all") {
 
 		DependencyRegistry.validateRoute(routeFile.oxiaAbsPath);
 
+		const routeFileBuildResult: RouteFileBuildResult = {
+			routeFile
+		};
+
 		try {
 			const html = await tsx2html(options, routeFile);
 			writeTextFile(routeFile.htmlAbsPath, html);
-		} catch (err) {
-			writeErrorHtml(routeFile, (err as Error).stack!.toString());
-			throw err;
+		} catch (error) {
+			routeFileBuildResult.error = error as Error;
+			writeErrorHtml(routeFile, (error as Error).stack!.toString());
 		}
 
 		Timings.end();
-		Timings.printOne(options.main.timings ? -1 : 0);
 
-		routeFilesBuilt.push(routeFile);
+		if (routeFileBuildResult.error) {
+			Log.writeln(chalk.bgRed.whiteBright(` Build ${routeFile.oxiaRelPath} failed `));
+			Log.error(routeFileBuildResult.error);
+		} else {
+			Timings.printOne(options.main.timings ? -1 : 0);
+		}
+
+		routeFileBuildResults.push(routeFileBuildResult);
 	}
 
-	return routeFilesBuilt;
+	return routeFileBuildResults;
 }
 
 /** Copies all static files to dist */
@@ -136,8 +146,7 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 
 	Timings.reset();
 
-	let ok = true;
-	let routeFilesBuilt: RouteFile[] = [];
+	let routeFileBuildResults: RouteFileBuildResult[] = [];
 
 	if (options.main.rebuildAll) {
 		if (changeType === "sources") {
@@ -153,12 +162,7 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 		}
 
 		// BUILD
-		try {
-			routeFilesBuilt = await build(options, changedFiles);
-		} catch (err) {
-			Log.error(err);
-			ok = false;
-		}
+		routeFileBuildResults = await build(options, changedFiles);
 
 		if (options.main.dumpMemFsToConsole) {
 			MemFs.getInstance().dumpToConsole(options);
@@ -174,17 +178,18 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 	}
 
 	// RELOAD
-	if (routeFilesBuilt.length) {
-		const routesToReload = routeFilesBuilt.map(f => f.routePath);
+	if (routeFileBuildResults.length) {
+		const routesToReload = routeFileBuildResults.map(r => r.routeFile.routePath);
 		reloadServer(routesToReload);
 	}
 
+	const ok = routeFileBuildResults.find(r => !!r.error) === undefined;
 	if (ok) {
-		if (routeFilesBuilt.length) {
+		if (routeFileBuildResults.length) {
 			Timings.printSum();
 		}
 	} else {
-		Log.writeln(`${chalk.bgRed.white(" Build failed! ")}`);
+		Log.writeln(`${chalk.bgRed.whiteBright(" Build failed! ")}`);
 	}
 }
 
