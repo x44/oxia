@@ -1,6 +1,6 @@
 {
 	"name": "oxia",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"author": "x44",
 	"license": "MIT",
 	"description": "Oxia is a static website build tool.",

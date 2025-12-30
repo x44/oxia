@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.10
+
+### Patch Changes
+
+- 9a92452: Improved error handling
+
 ## 0.0.9
 
 ### Patch Changes
