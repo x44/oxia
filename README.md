@@ -290,7 +290,7 @@ function Parent() {
 
 
 ## Global Styles
-Use the `global` attribute to create global styles. Note that this only applies to styles at the module level - function level styles with `global` are silently ignored.
+Use the `global` attribute to create global styles.
 
 ```html
 <style global> ... </style>
