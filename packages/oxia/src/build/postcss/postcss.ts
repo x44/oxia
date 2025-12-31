@@ -13,10 +13,10 @@ const scopeAttributesPlugin = (scopeId: string) => {
 		Once(root: any) {
 			root.walkRules((rule: any) => {
 				rule.selector = selectorParser(selectors => {
-					const selectorTagsAndClasses: (selectorParser.Tag | selectorParser.ClassName)[] = [];
+					const selectorTagsAndClasses: (selectorParser.Tag | selectorParser.ClassName | selectorParser.Identifier)[] = [];
 
 					selectors.walk(selector => {
-						if (selectorParser.isTag(selector) || selectorParser.isClassName(selector)) {
+						if (selectorParser.isTag(selector) || selectorParser.isClassName(selector) || selectorParser.isIdentifier(selector)) {
 							selectorTagsAndClasses.push(selector);
 						}
 					});
@@ -38,10 +38,10 @@ const scopeClassPlugin = (scopeId: string) => {
 		Once(root: any) {
 			root.walkRules((rule: any) => {
 				rule.selector = selectorParser(selectors => {
-					const selectorTagsAndClasses: (selectorParser.Tag | selectorParser.ClassName)[] = [];
+					const selectorTagsAndClasses: (selectorParser.Tag | selectorParser.ClassName | selectorParser.Identifier)[] = [];
 
 					selectors.walk(selector => {
-						if (selectorParser.isTag(selector) || selectorParser.isClassName(selector)) {
+						if (selectorParser.isTag(selector) || selectorParser.isClassName(selector) || selectorParser.isIdentifier(selector)) {
 							selectorTagsAndClasses.push(selector);
 						}
 					});
@@ -63,10 +63,10 @@ const scopeWherePlugin = (scopeId: string) => {
 		Once(root: any) {
 			root.walkRules((rule: any) => {
 				rule.selector = selectorParser(selectors => {
-					const selectorTagsAndClasses: (selectorParser.Tag | selectorParser.ClassName)[] = [];
+					const selectorTagsAndClasses: (selectorParser.Tag | selectorParser.ClassName | selectorParser.Identifier)[] = [];
 
 					selectors.walk(selector => {
-						if (selectorParser.isTag(selector) || selectorParser.isClassName(selector)) {
+						if (selectorParser.isTag(selector) || selectorParser.isClassName(selector) || selectorParser.isIdentifier(selector)) {
 							selectorTagsAndClasses.push(selector);
 						}
 					});
