@@ -1,5 +1,12 @@
 # oxia
 
+## 0.0.11
+
+### Patch Changes
+
+- 6e7cae7: Fixed style scoping of id-selectors
+- 088d8ae: Fix inner function styles without outer function style
+
 ## 0.0.10
 
 ### Patch Changes

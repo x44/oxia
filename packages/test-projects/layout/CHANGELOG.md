@@ -1,5 +1,13 @@
 # @test-projects/layout
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [6e7cae7]
+- Updated dependencies [088d8ae]
+  - oxia@0.0.11
+
 ## 0.0.3
 
 ### Patch Changes
