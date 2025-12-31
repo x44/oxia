@@ -212,8 +212,8 @@ export class React {
 			functionId: uuid(),
 			parent: undefined,
 			children: [],
-			styleIds: [],
-			styles: [],
+			style: undefined,
+			styleId: undefined,
 			slotStyles: new Map<string, SlotStyleInfo>(),
 			module: {
 				srcFilePath: "builtin",

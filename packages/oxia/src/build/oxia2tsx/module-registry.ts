@@ -86,6 +86,15 @@ export function createModule(srcModule: PreprocessedModule) {
 			if (srcFunction.styleId) {
 				rootStyleIds.push(srcFunction.styleId);
 			}
+		} else {
+			// A non-root function may have a root style, if the function's parent function has no style
+			if (srcFunction.styleId) {
+				const style = getPreprocessedStyle(srcFunction.styleId);
+				if (!style.parentStyleId || getPreprocessedStyle(style.parentStyleId).level === "module") {
+					// It's a root style
+					rootStyleIds.push(srcFunction.styleId);
+				}
+			}
 		}
 
 		for (const slotStyleId of srcFunction.slotStyleIds) {
@@ -121,8 +130,8 @@ function addFunction(module: ModuleInfo, parent: FunctionInfo | undefined, src: 
 		module,
 		parent,
 		children: [],
-		styles: [],
-		styleIds: [],
+		style: undefined,
+		styleId: undefined,
 		slotStyles: new Map<string, SlotStyleInfo>(),
 	};
 
@@ -210,9 +219,8 @@ function addStyleToFunction(func: FunctionInfo, style: StyleInfo, add = false) {
 	}
 
 	if (add) {
-		// remove all styles we inherited so far
-		func.styles = [style];
-		func.styleIds = [style.styleId];
+		func.style = style;
+		func.styleId = style.styleId;
 	}
 
 	for (const childFunc of func.children) {
@@ -223,8 +231,13 @@ function addStyleToFunction(func: FunctionInfo, style: StyleInfo, add = false) {
 export function getGlobalStylesForModules(srcFilePaths: string[]) {
 	const styles: StyleInfo[] = [];
 	for (const srcFilePath of srcFilePaths) {
-		const module = moduleRegistry.get(srcFilePath)!;
-		if (module.globalStyle) {
+		const module = moduleRegistry.get(srcFilePath);
+		// Note, that a module may get requested that actually is not registered
+		// This happens if a .oxia file imports another .oxia file but does not
+		// use the imported component(s), which happens if organize imports does
+		// not remove unused imports. Therefore it is ok if a requested module
+		// is not registered.
+		if (module && module.globalStyle) {
 			styles.push(module.globalStyle);
 		}
 	}
@@ -247,8 +260,8 @@ export function dumpModule(srcFilePath: string) {
 
 function dumpFunction(func: FunctionInfo, indent = 1) {
 	console.log(`${" ".repeat(indent * 2)}Function ${func.functionId} '${func.name}'`);
-	for (const style of func.styles) {
-		console.log(`${" ".repeat((indent + 1) * 2)}Style ${style.styleId}`);
+	if (func.style) {
+		console.log(`${" ".repeat((indent + 1) * 2)}Style ${func.style.styleId}`);
 	}
 	for (const childFunc of func.children) {
 		dumpFunction(childFunc, indent + 1);

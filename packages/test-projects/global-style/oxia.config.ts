@@ -9,5 +9,8 @@ export default defineConfig({
 	},
 	main: {
 		timings: false
+	},
+	build: {
 	}
+
 });

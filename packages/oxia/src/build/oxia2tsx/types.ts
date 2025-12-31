@@ -139,9 +139,8 @@ export type FunctionInfo = {
 	module: ModuleInfo;
 	parent: FunctionInfo | undefined;
 	children: FunctionInfo[];
-	/** Ordered from lowest CSS priority (module-level) to highest CSS priority (function-level) */
-	styles: StyleInfo[];
-	styleIds: string[];
+	style: StyleInfo | undefined;
+	styleId: string | undefined;
 
 	/** Key: slotName */
 	slotStyles: Map<string, SlotStyleInfo>;

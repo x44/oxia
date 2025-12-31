@@ -116,7 +116,7 @@ export default class Element {
 	private slottedName?: string;
 
 	/** Style scoping - the styles this element uses. */
-	private styles: StyleInfo[] = [];
+	private style?: StyleInfo;
 
 	/** Style scoping slot style - the slot styles this element uses. Key: slotName */
 	private slotStylesMap?: Map<string, SlotStyleInfo>;
@@ -177,7 +177,7 @@ export default class Element {
 
 		clone.filledSlotNames = this.filledSlotNames;
 
-		clone.styles = this.styles;
+		clone.style = this.style;
 		clone.styleUuid = this.styleUuid;
 		clone.slotStylesMap = this.slotStylesMap;
 
@@ -304,13 +304,13 @@ export default class Element {
 		this.isComponent = true;
 
 		if (!this.isText) {
-			this.styles = functionInfo.styles;
+			this.style = functionInfo.style;
 			this.slotStylesMap = functionInfo.slotStyles;
 		}
 	}
 
-	private getStyles() {
-		return this.componentFragment ? this.componentFragment.styles : undefined;
+	private getStyle() {
+		return this.componentFragment ? this.componentFragment.style : undefined;
 	}
 
 	private getSlotStylesMap() {
@@ -414,17 +414,17 @@ export default class Element {
 		}
 	}
 
-	registerScopedStyles(styleRegistry: StyleRegistry) {
+	registerScopedStyle(styleRegistry: StyleRegistry) {
 		if (this.isComponent) {
-			const styles = this.getStyles();
-			if (styles && styles.length) {
-				const styleUuid = registerScopedStyle(styleRegistry, styles);
+			const style = this.getStyle();
+			if (style) {
+				const styleUuid = registerScopedStyle(styleRegistry, style);
 				this.initStyleRegistryReferences(styleUuid);
 			}
 		}
 
 		for (let i = 0; i < this.children.length; ++i) {
-			this.children[i].registerScopedStyles(styleRegistry);
+			this.children[i].registerScopedStyle(styleRegistry);
 		}
 	}
 
@@ -581,7 +581,7 @@ export default class Element {
 			const slotStyle = this.getSlotStyle(slotName);
 			if (slotStyle) {
 				const childName = child.componentFunctionInfo ? `${child.componentFunctionInfo.name}()` : `<${child.tag}>`;
-				const styleScopeId = registerSlotStyle(styleRegistry, this.getStyles(), child.getStyles(), slotStyle, childName);
+				const styleScopeId = registerSlotStyle(styleRegistry, this.getStyle(), child.getStyle(), slotStyle, childName);
 				// Assign final style scope ID to the slotted child and all it's non-component children
 				child.initStyleRegistryReferences(styleScopeId);
 			}

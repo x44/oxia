@@ -1,31 +1,66 @@
 import Component from "../components/Component.oxia";
 import "../components/StyleOnly.oxia";
 
+function Outer() {
+	return (
+		<div id="some">
+			Outer
+			<p>Para</p>
+			<Inner></Inner>
+		</div>
+	)
+
+	// <style>
+	// 	outer-scoped {
+	// 		color: magenta;
+	// 	}
+	// 	#outer-scoped {
+	// 		color: magenta;
+	// 	}
+	// </style>
+
+	<style id="OUTER-EMPTY"></style>
+
+	function Inner() {
+		return (
+			<div>
+				Inner
+				<button>Inner</button>
+			</div>
+		)
+
+		<style id="INNER">
+			inner-scoped {
+				color: magenta;
+			}
+		</style>
+
+		<style id="INNER-2">
+			#inner-scoped {
+				color: magenta;
+			}
+		</style>
+	}
+}
+
 export default function index() {
 	return (
 		<body>
-			<style>
-			div {
-				color: red;
-			}
-			</style>
 			<div>Hello, world!</div>
 			<Component></Component>
+			<Outer></Outer>
 		</body>
 	)
 
-	<style>
-		div {
-			color: green;
+	<style id="INDEX">
+		#index-scoped {
+			color: magenta;
 		}
 	</style>
 }
 
-
-<style global>
-body {
-	font-family: monospace;
-	background-color: #402000;
-	color: blue;
-}
+<style id="MODULE">
+	#module-scoped {
+		color: magenta;
+	}
 </style>

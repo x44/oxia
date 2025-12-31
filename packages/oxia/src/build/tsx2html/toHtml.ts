@@ -103,7 +103,7 @@ export default async function toHtml(options: ResolvedOptions, file: RouteFile) 
 
 		root.initComponentReferences();
 
-		root.registerScopedStyles(styleRegistry);
+		root.registerScopedStyle(styleRegistry);
 
 		root = root.slotify(styleRegistry);
 

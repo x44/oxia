@@ -13,14 +13,14 @@ type GlobalStyleRegistry = {
 
 type UnresolvedScopedCss = {
 	uuid: string;
-	styles: StyleInfo[];
+	style: StyleInfo;
 }
 
 type ResolvedScopedCss = {
 	uuid: string;
 	styleId: string;
 	module: ModuleInfo;
-	functions: (FunctionInfo | undefined)[];
+	function: FunctionInfo | undefined;
 	css: string;
 }
 
@@ -33,7 +33,7 @@ type ScopedStyleRegistry = {
 
 type UnresolvedSlotCss = {
 	uuid: string;
-	childStyles: StyleInfo[];
+	childStyle: StyleInfo | undefined;
 	slotStyle: SlotStyleInfo;
 	slotChildName: string;
 }
@@ -146,8 +146,9 @@ function getScopedStyleRegistryCss(registry: ScopedStyleRegistry) {
 	let css = "";
 	for (let i = 0; i < registry.resolvedList.length; ++i) {
 		if (DEBUG) {
-			const strs = registry.resolvedList[i].functions.map(func => !func ? "Module" : `${func.name}()`);
-			css += textBox("SCOPED STYLE", registry.resolvedList[i].module.srcFilePath, strs.join(" + "));
+			const func = registry.resolvedList[i].function;
+			const str = func ? func.name : "Module";
+			css += textBox("SCOPED STYLE", registry.resolvedList[i].module.srcFilePath, str);
 		}
 
 		css += registry.resolvedList[i].css;
@@ -155,8 +156,8 @@ function getScopedStyleRegistryCss(registry: ScopedStyleRegistry) {
 	return css;
 }
 
-export function registerScopedStyle(registry: StyleRegistry, styles: StyleInfo[]) {
-	const uuid = getScopedStyleUuid(styles);
+export function registerScopedStyle(registry: StyleRegistry, style: StyleInfo) {
+	const uuid = getScopedStyleUuid(style);
 
 	let styleCss = registry.scopedStyleRegistry.unresolvedMap.get(uuid);
 	if (!styleCss) {
@@ -164,8 +165,8 @@ export function registerScopedStyle(registry: StyleRegistry, styles: StyleInfo[]
 
 		styleCss = {
 			uuid,
-			styles: [...styles],
-		}
+			style,
+		};
 
 		registry.scopedStyleRegistry.unresolvedMap.set(uuid, styleCss);
 		registry.scopedStyleRegistry.unresolvedList.push(styleCss);
@@ -174,10 +175,9 @@ export function registerScopedStyle(registry: StyleRegistry, styles: StyleInfo[]
 	return styleCss.uuid;
 }
 
-function getScopedStyleUuid(styles: StyleInfo[]) {
-	const styleIds = styles.map(style => style.styleId);
+function getScopedStyleUuid(style: StyleInfo) {
 	// Tag the uuid with "SCOPED", so we know where to look it up when the resolved style is requested
-	const uuid = `SCOPED-${[styleIds].join("+")}`;
+	const uuid = `SCOPED-${style.styleId}`;
 	return uuid;
 }
 
@@ -194,41 +194,24 @@ function getScopedStyleId(registry: StyleRegistry, uuid: string) {
 }
 
 function resolveScopedCss(registry: StyleRegistry, unresolved: UnresolvedScopedCss): ResolvedScopedCss {
-	const styles = unresolved.styles;
-	const styleId = getNextScopedStyleId(registry, styles);
-	let css = combineCss(styles);
+	const style = unresolved.style;
+	const styleId = getNextScopedStyleId(registry, style);
+	let css = combineCss([style]);
 	css = processScopedCss(registry.scopedStyleStrategy, "dummy", css, styleId);
 
 	const resolved: ResolvedScopedCss = {
 		uuid: unresolved.uuid,
 		styleId,
-		module: styles[0].module,
-		functions: styles.map(style => style.function),
+		module: style.module,
+		function: style.function,
 		css,
-	}
+	};
 
 	return resolved;
 }
 
-function getNextScopedStyleId(registry: StyleRegistry, styles: StyleInfo[]) {
-	let id: string | undefined = undefined;
-	const fixedIds: string[] = [];
-	let useFixedIds = false;
-	for (let i = 0; i < styles.length; ++i) {
-		const fixedId = styles[i].fixedId;
-		if (fixedId) {
-			useFixedIds = true;
-			fixedIds.push(fixedId);
-		} else {
-			if (!id) id = getNextStyleId(registry);
-			fixedIds.push(id);
-		}
-	}
-
-	if (useFixedIds) {
-		return fixedIds.join("-");
-	}
-	return id || getNextStyleId(registry);
+function getNextScopedStyleId(registry: StyleRegistry, style: StyleInfo) {
+	return style.fixedId || getNextStyleId(registry);
 }
 
 
@@ -257,20 +240,8 @@ function getSlotStyleRegistryCss(registry: SlotStyleRegistry) {
 	return css;
 }
 
-export function registerSlotStyle(registry: StyleRegistry, slotParentStyles: StyleInfo[] | undefined, slotChildStyles: StyleInfo[] | undefined, slotStyle: SlotStyleInfo, slotChildName: string) {
-	const parentStyles = slotParentStyles || [];
-	const childStyles = slotChildStyles || [];
-
-	if (parentStyles.length && childStyles.length) {
-		// Remove from parentStyles those elements that are also in childStyles.
-		// Since we create a combined style, we can avoid some extra work in
-		// the postcss steps by doing so.
-		for (let i = parentStyles.length - 1; i >= 0; --i) {
-			if (childStyles.includes(parentStyles[i])) parentStyles.splice(i, 1);
-		}
-	}
-
-	const uuid = getSlotStyleUuid(parentStyles, childStyles, slotStyle);
+export function registerSlotStyle(registry: StyleRegistry, slotParentStyle: StyleInfo | undefined, slotChildStyle: StyleInfo | undefined, slotStyle: SlotStyleInfo, slotChildName: string) {
+	const uuid = getSlotStyleUuid(slotParentStyle, slotChildStyle, slotStyle);
 
 	let styleCss = registry.slotStyleRegistry.unresolvedMap.get(uuid);
 	if (!styleCss) {
@@ -278,10 +249,10 @@ export function registerSlotStyle(registry: StyleRegistry, slotParentStyles: Sty
 
 		styleCss = {
 			uuid,
-			childStyles: [...childStyles],
+			childStyle: slotChildStyle,
 			slotStyle,
 			slotChildName,
-		}
+		};
 
 		registry.slotStyleRegistry.unresolvedMap.set(uuid, styleCss);
 		registry.slotStyleRegistry.unresolvedList.push(styleCss);
@@ -290,11 +261,11 @@ export function registerSlotStyle(registry: StyleRegistry, slotParentStyles: Sty
 	return styleCss.uuid;
 }
 
-function getSlotStyleUuid(slotParentStyles: StyleInfo[], slotChildStyles: StyleInfo[], slotStyle: SlotStyleInfo) {
-	const slotParentStyleIds = slotParentStyles.map(style => style.styleId);
-	const slotChildStyleIds = slotChildStyles.map(style => style.styleId);
+function getSlotStyleUuid(slotParentStyle: StyleInfo | undefined, slotChildStyle: StyleInfo | undefined, slotStyle: SlotStyleInfo) {
+	const slotParentStyleId = slotParentStyle ? slotParentStyle.styleId : "none";
+	const slotChildStyleId = slotChildStyle ? slotChildStyle.styleId: "none";
 	// Tag the uuid with "SLOT", so we know where to look it up when the resolved style is requested
-	const uuid = `SLOT-${[slotParentStyleIds, slotChildStyleIds, slotStyle.styleId].join("+")}`;
+	const uuid = `SLOT-${[slotParentStyleId, slotChildStyleId, slotStyle.styleId].join("+")}`;
 	return uuid;
 }
 
@@ -310,11 +281,11 @@ function getSlotStyleId(registry: StyleRegistry, uuid: string) {
 }
 
 function resolveSlotCss(registry: StyleRegistry, unresolved: UnresolvedSlotCss): ResolvedSlotCss {
-	const childStyles = unresolved.childStyles;
+	const childStyle = unresolved.childStyle;
 	const slotStyle = unresolved.slotStyle;
 
-	const styleId = getNextSlotStyleId(registry, childStyles, slotStyle);
-	let css = combineCss(childStyles, slotStyle);
+	const styleId = getNextSlotStyleId(registry, childStyle, slotStyle);
+	let css = combineCss(childStyle ? [childStyle] : [], slotStyle);
 	css = processScopedCss(registry.scopedStyleStrategy, "dummy", css, styleId);
 
 	const resolved: ResolvedSlotCss = {
@@ -328,24 +299,22 @@ function resolveSlotCss(registry: StyleRegistry, unresolved: UnresolvedSlotCss):
 	return resolved;
 }
 
-function getNextSlotStyleId(registry: StyleRegistry, slotChildStyles: StyleInfo[], slotStyle: SlotStyleInfo) {
+function getNextSlotStyleId(registry: StyleRegistry, slotChildStyle: StyleInfo | undefined, slotStyle: SlotStyleInfo) {
 	let id: string | undefined = undefined;
 	const fixedIds: string[] = [];
 	let useFixedIds = false;
-	for (let i = 0; i < slotChildStyles.length; ++i) {
-		const fixedId = slotChildStyles[i].fixedId;
-		if (fixedId) {
-			useFixedIds = true;
-			fixedIds.push(fixedId);
-		} else {
-			if (!id) id = getNextStyleId(registry);
-			fixedIds.push(id);
-		}
-	}
-	const fixedId = slotStyle.fixedId;
-	if (fixedId) {
+
+	if (slotChildStyle && slotChildStyle.fixedId) {
 		useFixedIds = true;
-		fixedIds.push(fixedId);
+		fixedIds.push(slotChildStyle.fixedId);
+	} else {
+		if (!id) id = getNextStyleId(registry);
+		fixedIds.push(id);
+	}
+
+	if (slotStyle.fixedId) {
+		useFixedIds = true;
+		fixedIds.push(slotStyle.fixedId);
 	} else {
 		if (!id) id = getNextStyleId(registry);
 		fixedIds.push(id);
@@ -357,10 +326,10 @@ function getNextSlotStyleId(registry: StyleRegistry, slotChildStyles: StyleInfo[
 	return id || getNextStyleId(registry);
 }
 
-function combineCss(childStyles: StyleInfo[], slotStyle?: SlotStyleInfo) {
+function combineCss(styles: StyleInfo[], slotStyle?: SlotStyleInfo) {
 	let css = "";
-	for (const childStyle of childStyles)	{
-		const styleCss = replaceTsBlocksWithResults(childStyle);
+	for (const style of styles)	{
+		const styleCss = replaceTsBlocksWithResults(style);
 		css = appendNonEmptyLines(styleCss, css);
 	}
 	if (slotStyle) {
