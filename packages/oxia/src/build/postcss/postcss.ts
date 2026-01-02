@@ -1,6 +1,7 @@
 import postcss from "postcss";
 import combineDuplicateSelectors from "postcss-combine-duplicated-selectors";
 import discardComments from "postcss-discard-comments";
+import nested from "postcss-nested";
 import selectorParser from "postcss-selector-parser";
 import type { ScopedStyleStrategy } from "../../config/types.js";
 import { STYLE_SCOPE_ATTRIBUTE_PREFIX, STYLE_SCOPE_CLASS_PREFIX } from "../tsx2html/types.js";
@@ -89,6 +90,7 @@ export function processScopedCss(scopedStyleStrategy: ScopedStyleStrategy, srcFi
 
 	let out = css;
 	out = postcss([
+		nested(),
 		scopePlugin(scopeId),
 		combineDuplicateSelectors({ removeDuplicatedProperties: true }),
 		discardComments(),
@@ -99,6 +101,7 @@ export function processScopedCss(scopedStyleStrategy: ScopedStyleStrategy, srcFi
 export function processGlobalCss(srcFilePath: string, css: string) {
 	let out = css;
 	out = postcss([
+		nested(),
 		combineDuplicateSelectors({ removeDuplicatedProperties: true }),
 		discardComments(),
 	]).process(out, { from: srcFilePath }).css;

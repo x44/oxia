@@ -1,28 +1,36 @@
-function Component() {
-	return (
-		<div>
-			<span>Component</span>
-			<slot></slot>
-			<div ifSlotEmpty>
-				DIV
-			</div>
-		</div>
-	)
-
-	<style slot>
-		span {
-			color: orange;
-		}
-	</style>
-}
-
-function Child() {
-	return <span>Child</span>
-}
-
 export default function index() {
 	return (
-		<Component><span>Hello</span></Component>
-		<Component><Child></Child></Component>
+		<div class="btn">
+			<img src={`sdfsdf`} />
+		</div>
 	)
 }
+
+<style>
+	.btn {
+		border: 8px solid green;
+
+		& {
+			border: 8px solid yellow;
+		}
+
+		&::after {
+			content: "";
+		}
+
+		&:hover {
+			opacity: 1;
+		}
+
+		&[selected]::after {
+			opacity: 1;
+		}
+	}
+</style>
+
+<style global>
+	body {
+		background: #101010;
+	}
+</style>
+
