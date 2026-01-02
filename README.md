@@ -473,6 +473,129 @@ export default function index() {
 }
 ```
 
+## Self-Slotting
+A component can define for itself which slot it should be placed into.
+
+Let's look at this example:
+```tsx
+function Card() {
+	return (
+		<div>
+			<slot name="title"/>
+			<slot name="text"/>
+		</div>
+	)
+}
+
+function CardTitle() {
+	return <div>Title</div>
+}
+
+function CardText() {
+	return <div>Text</div>
+}
+
+function Cards() {
+	return (
+		<div>
+			<Card>
+				<CardTitle slot="title"></CardTitle>
+				<CardText slot="text"></CardText>
+			</Card>
+			<Card>
+				<CardTitle slot="title"></CardTitle>
+				<CardText slot="text"></CardText>
+			</Card>
+		</div>
+	)
+}
+```
+We can avoid the repetitive `slot="title"` and `slot="text"` like this:
+```tsx
+function Card() {
+	return (
+		<div>
+			<slot name="title"/>
+			<slot name="text"/>
+		</div>
+	)
+}
+
+function CardTitle() {
+	return <div slot="title">Title</div>
+}
+
+function CardText() {
+	return <div slot="text">Text</div>
+}
+
+function Cards() {
+	return (
+		<div>
+			<Card>
+				<CardTitle></CardTitle>
+				<CardText></CardText>
+			</Card>
+			<Card>
+				<CardTitle></CardTitle>
+				<CardText></CardText>
+			</Card>
+		</div>
+	)
+}
+```
+If a component has multiple child elements, we have to wrap these elements to avoid repetitive `slot` attributes like this:
+```tsx
+function CardTitle() {
+	return (
+		<div slot="title">
+			<h1>Title</h1>
+			<span>Sub-Title</span>
+		</div>
+	)
+}
+```
+However, to avoid the extra `<div>` element, we can use a `<fragment>` instead:
+```tsx
+function CardTitle() {
+	return (
+		<fragment slot="title">
+			<h1>Title</h1>
+			<span>Sub-Title</span>
+		</fragment>
+	)
+}
+```
+
+
+A component can also define into which slot(s) its child elements should be placed.
+
+`CardContent` combines the `CardTitle` and `CardText` components into a single component, but places it's child elements into different slots:
+```tsx
+function CardContent() {
+	return (
+		<div slot="title">Title</div>
+		<div slot="text">Text</div>
+	)
+}
+```
+
+We could also use one or more `<fragment>` elements:
+```tsx
+function CardContent() {
+	return (
+		<fragment slot="title">
+			<h1>Title</h1>
+			<span>Sub-Title</span>
+		</fragment>
+		<fragment slot="text">
+			<div>Text</div>
+		</fragment>
+	)
+}
+```
+
+
 ## Slot Fallback Content
 Slots can render fallback content if no content is slotted:
 ```tsx

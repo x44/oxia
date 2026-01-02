@@ -7,6 +7,9 @@ declare global {
 export { };
 
 interface IntrinsicHTMLElements {
+	// oxia-specific Elements
+	fragment: FragmentHTMLAttributes<HTMLElement>;
+
 	a: AnchorHTMLAttributes<HTMLAnchorElement>;
 	abbr: HTMLAttributes<HTMLElement>;
 	address: HTMLAttributes<HTMLElement>;
@@ -915,6 +918,9 @@ interface AllHTMLAttributes<T> extends HTMLAttributes<T> {
 	width?: number | string | undefined;
 	wmode?: string | undefined;
 	wrap?: string | undefined;
+}
+
+interface FragmentHTMLAttributes<T> extends Pick<HTMLAttributes<T>, "slot"> {
 }
 
 type HTMLAttributeReferrerPolicy =

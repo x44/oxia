@@ -213,21 +213,17 @@ importers:
         specifier: workspace:*
         version: link:../../oxia
 
-  packages/test-projects/speed-test:
+  packages/test-projects/slotting:
     dependencies:
       oxia:
         specifier: workspace:*
         version: link:../../oxia
 
-  packages/test-projects/test:
+  packages/test-projects/speed-test:
     dependencies:
       oxia:
         specifier: workspace:*
         version: link:../../oxia
-    devDependencies:
-      '@types/node':
-        specifier: ^25.0.1
-        version: 25.0.1
 
   packages/test-projects/trash:
     dependencies:

@@ -147,6 +147,7 @@ export class React {
 			} else {
 				// Function returned a fragment, and the fragment was created by the function, not just passed through
 				this.assignComponentFunction(element, tagOrFunction, functionInfo);
+				element.setProps(props || {});
 			}
 		}
 

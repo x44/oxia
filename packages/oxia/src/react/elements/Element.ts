@@ -56,7 +56,7 @@ const HeadChildTags = new Set<string>([
 
 export default class Element {
 	private tag: string;
-	private props: ElementProps;
+	private props!: ElementProps;
 	private parent: Element | undefined;
 	private children: Element[] = [];
 
@@ -128,16 +128,13 @@ export default class Element {
 
 	constructor(tag: string, props: ElementProps) {
 		this.tag = tag;
-		this.props = props;
 		this.isVoid = VoidTags.has(this.tag);
 		this.isFrag = tag === "fragment";
 		this.isSlot = tag === "slot";
 		this.isHead = tag === "head";
 		this.isHeadChild = HeadChildTags.has(tag);
 
-		this.storePropsAsAttributes(this.props);
-
-		this.validateSlotNames();
+		this.setProps(props);
 	}
 
 	/**
@@ -187,6 +184,11 @@ export default class Element {
 			childClone.parent = clone;
 		}
 		return clone;
+	}
+
+	setProps(props: ElementProps) {
+		this.props = props;
+		this.storePropsAsAttributes(this.props);
 	}
 
 	private storePropsAsAttributes(props: ElementProps) {
@@ -266,24 +268,6 @@ export default class Element {
 		} else
 		if (key === "slot") {
 			this.slot = null;
-		}
-	}
-
-	private validateSlotNames() {
-		if (this.isSlot) this.validateSlotName(this.name);
-		this.validateSlotName(this.slot);
-	}
-
-	private validateSlotName(slotName: string | null) {
-		slotName = this.toSlotName(slotName);
-		// Must not start with a digit
-		// Must only contain letters, digits, '-', '_'
-		if (slotName[0] >= "0" && slotName[0] <= "9") {
-			throw new Error(`Invalid slot name '${slotName}'. Must not start with a digit.`);
-		}
-
-		if (!/^[a-zA-Z0-9_-]+$/.test(slotName)) {
-			throw new Error(`Invalid slot name '${slotName}'. May only contain letters, digits, underscore and hyphen.`);
 		}
 	}
 
@@ -458,30 +442,55 @@ export default class Element {
 					this.getAvailableSlots(slotMap);
 				}
 
-				const slotName = this.toSlotName(child.slot);
+				if (child.isFrag && child.slot === null)  {
+					// Self-slotting feature - A component defines the destination slots
+					//
+					// function Child() {
+					// 	return (
+					// 		<div slot="slot name of a slot in the parent component"/>
+					// 		<div slot="another slot name of a slot in the parent component"/>
+					// 	)
+					// }
 
-				const slots = slotMap.get(slotName);
+					const fragment = child;
+					const fragmentChildren = fragment.children;
+					for (let j = 0; j < fragmentChildren.length; ++j) {
+						const fragmentChild = fragmentChildren[j];
+						const slotName = this.toSlotName(fragmentChild.slot);
+						const slots = slotMap.get(slotName);
 
-				if (slots && slots.length) {
-					// important(`${this.toDumpString()} found ${slots.length} slot(s) for slotName '${slotName}'`);
-					// important(`${this.toDumpString()} adding to slot '${slotName}': ${child.toDumpString()}`);
-					// slots.forEach(slot => slot.addAttribute("FOUNDBY", `${slot.getAttribute("FOUNDBY") ? slot.getAttribute("FOUNDBY") + "," : ""}${this.componentFunctionName}`));
+						if (slots && slots.length) {
+							// Log.info(`${this.toDumpString()} found ${slots.length} slot(s) for slotName '${slotName}'`);
+							// Log.info(`${this.toDumpString()} adding to slot '${slotName}': ${fragmentChild.toDumpString()}`);
+							// slots.forEach(slot => slot.addAttribute("FOUNDBY", `${slot.getAttribute("FOUNDBY") ? slot.getAttribute("FOUNDBY") + "," : ""}${this.componentFunctionName}`));
 
-					// We found slots for the child to be slotted.
-					// Add child (clones) to *each* found slot
-					this.addChildToSlots(styleRegistry, child, slots);
-
-					// Remove the child
-					child.parent = undefined;
-					this.children.splice(i, 1);
-					--i;
+							// Add child *clones* to *each* found slot
+							fragment.slotify(styleRegistry);
+							this.addChildToSlots(styleRegistry, fragmentChild, slots);
+						} else {
+							Log.warn(`${this.toLogString()} has no slot '${slotName}' to add ${fragmentChild.toLogString()}`);
+						}
+					}
 				} else {
-					Log.warn(`${this.toLogString()} has no slot '${slotName}' to add ${child.toLogString()}`);
-					// Remove the child
-					child.parent = undefined;
-					this.children.splice(i, 1);
-					--i;
+					const slotName = this.toSlotName(child.slot);
+					const slots = slotMap.get(slotName);
+
+					if (slots && slots.length) {
+						// Log.info(`${this.toDumpString()} found ${slots.length} slot(s) for slotName '${slotName}'`);
+						// Log.info(`${this.toDumpString()} adding to slot '${slotName}': ${child.toDumpString()}`);
+						// slots.forEach(slot => slot.addAttribute("FOUNDBY", `${slot.getAttribute("FOUNDBY") ? slot.getAttribute("FOUNDBY") + "," : ""}${this.componentFunctionName}`));
+
+						// Add child *clones* to *each* found slot
+						this.addChildToSlots(styleRegistry, child, slots);
+					} else {
+						Log.warn(`${this.toLogString()} has no slot '${slotName}' to add ${child.toLogString()}`);
+					}
 				}
+
+				// Remove the child
+				child.parent = undefined;
+				this.children.splice(i, 1);
+				--i;
 			}
 		}
 
@@ -772,11 +781,15 @@ export default class Element {
 		return val;
 	}
 
-	private mergeAttributes(attributes: Attribute[]) {
+	private filterAndMergeAttributes(attributes: Attribute[]) {
 		const out: Attribute[] = [];
 		let classAttribute: Attribute | undefined = undefined;
 		for (let i = 0; i < attributes.length; ++i) {
 			let attribute = attributes[i];
+			// Filter
+			if (attribute.key === "slot") continue;
+
+			// Merge
 			if (attribute.key === "class") {
 				const val = this.attributeValueToStringOrBoolean(attribute.val);
 				if (typeof val === "string") {
@@ -805,7 +818,7 @@ export default class Element {
 
 	private attributesToHtml(styleRegistry: StyleRegistry) {
 
-		const attributes = this.mergeAttributes(this.attributes);
+		const attributes = this.filterAndMergeAttributes(this.attributes);
 
 		// Add style scope
 		if (this.styleId) {
