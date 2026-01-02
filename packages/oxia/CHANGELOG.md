@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.13
+
+### Patch Changes
+
+- d7a7871: Fixed nested CSS selectors
+
 ## 0.0.12
 
 ### Patch Changes
