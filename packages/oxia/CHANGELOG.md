@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.12
+
+### Patch Changes
+
+- e093808: Added self-slotting feature
+
 ## 0.0.11
 
 ### Patch Changes
