@@ -63,6 +63,7 @@ export abstract class TermWidget {
 	onDelete() {}
 	onInsert() {}
 	onSpace() {}
+	onTab() {}
 	onEscape() {}
 	onKey(s: string, key: any) {}
 	onEnter() {}
@@ -235,6 +236,7 @@ export class InputWidget extends TermWidget {
 		if (this.pos > 0) {
 			--this.pos;
 			this.out.write(cursor.backward(1));
+			this.render();
 		}
 	}
 
@@ -242,26 +244,35 @@ export class InputWidget extends TermWidget {
 		if (this.pos < this.txt.length) {
 			++this.pos;
 			this.out.write(cursor.forward(1));
+			this.render();
 		}
 	}
 
 	override onHome(): void {
-		this.pos = 0;
+		if (this.pos !== 0) {
+			this.pos = 0;
+			this.render();
+		}
 	}
 
 	override onEnd(): void {
-		this.pos = this.txt.length;
+		if (this.pos !== this.txt.length) {
+			this.pos = this.txt.length;
+			this.render();
+		}
 	}
 
 	override onDelete(): void {
 		if (this.pos >= this.txt.length) return;
 		this.txt = this.txt.substring(0, this.pos) + this.txt.substring(this.pos + 1);
+		this.render();
 	}
 
 	override onBackspace(): void {
 		if (this.pos <= 0) return;
 		this.txt = this.txt.substring(0, this.pos - 1) + this.txt.substring(this.pos);
 		--this.pos;
+		this.render();
 	}
 
 	override onSpace(): void {
@@ -270,9 +281,11 @@ export class InputWidget extends TermWidget {
 	}
 
 	override onKey(s: string, key: any): void {
+		if (s === undefined) return;
 		if (this.txt.length >= this.maxLen) return;
 		this.txt = this.txt.substring(0, this.pos) + s + this.txt.substring(this.pos);
 		++this.pos;
+		this.render();
 	}
 
 	override onEnter(): void {
@@ -285,8 +298,6 @@ export class InputWidget extends TermWidget {
 
 	override render() {
 		if (this.done) return;
-
-		const theme = getTheme();
 
 		this.out.write(cursor.hide);
 
