@@ -1,5 +1,11 @@
 # create-oxia
 
+## 0.0.11
+
+### Patch Changes
+
+- 73f908a: Fixed tab and undefined key input
+
 ## 0.0.10
 
 ### Patch Changes
