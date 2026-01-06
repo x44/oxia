@@ -67,6 +67,9 @@ export class Term {
 			if (key.name === "space") {
 				this.widget.onSpace();
 			} else
+			if (key.name === "tab") {
+				this.widget.onTab();
+			} else
 			if (key.name === "escape") {
 				this.widget.onEscape();
 			} else
@@ -75,8 +78,6 @@ export class Term {
 			} else {
 				this.widget.onKey(s, key);
 			}
-
-			this.widget.render();
 		};
 		this.in.on("keypress", keyListener);
 
