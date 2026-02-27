@@ -216,12 +216,6 @@ importers:
         specifier: workspace:*
         version: link:../../oxia
 
-  packages/test-projects/slotting:
-    dependencies:
-      oxia:
-        specifier: workspace:*
-        version: link:../../oxia
-
   packages/test-projects/speed-test:
     dependencies:
       oxia:
