@@ -100,6 +100,23 @@ const contentTypeMap = new Map<string, string>([
 	[".7z", "application/x-7z-compressed"],
 ]);
 
+const stringExtSet = new Set<string>([
+	".css",
+	".csv",
+	".htm",
+	".html",
+	".js",
+	".json",
+	".md",
+	".mjs",
+	".php",
+	".sh",
+	".svg",
+	".txt",
+	".xhtml",
+	".xml",
+]);
+
 // NOTE Do not use realpathSync(argv[1]) here!
 let oxiaDir = dirname(argv[1]);
 oxiaDir = oxiaDir.includes("node_modules") ? `${oxiaDir}/dist` : `${oxiaDir}`;
@@ -155,16 +172,23 @@ async function startDevServerInstance(options: ResolvedServerOptions, name: stri
 		}
 
 		try {
-			let content = readFileSync(join(routesDir, path), "utf8");
-
-			for (let i = 0; i < middlewares.length; ++i) {
-				content = await runMiddleware(middlewares[i], req, path, content);
-			}
-
 			const ext = extname(path);
-			if (ext === ".html") {
-				// Inject reload client script
-				content += clientReloadScriptCode;
+
+			let content: string | Buffer;
+
+			if (stringExtSet.has(ext)) {
+				content = readFileSync(join(routesDir, path), "utf8");
+
+				for (let i = 0; i < middlewares.length; ++i) {
+					content = await runMiddleware(middlewares[i], req, path, content);
+				}
+
+				if (ext === ".html") {
+					// Inject reload client script
+					content += clientReloadScriptCode;
+				}
+			} else {
+				content = readFileSync(join(routesDir, path));
 			}
 
 			const contentType = contentTypeMap.get(ext);
