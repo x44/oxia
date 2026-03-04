@@ -80,7 +80,7 @@ function applyBgAndFg(bg: string | undefined, fg: string | undefined): ChalkInst
 		? toBgFg(bg, fg)
 		: bg
 			? toBg(bg)
-			: toFg(fg);
+			: toFg(fg!);
 }
 
 function toBgFg(bgHexOrKey: string, fgHexOrKey: string) {
@@ -121,7 +121,7 @@ function toFg(hexOrKey: string) {
 }
 
 export function toStyledString(styledText: StyledText, active: boolean): string {
-    return styledText.map(st => applyTextStyle(st.text, st.style, active, st.highlight)).join("");
+    return styledText.map(st => applyTextStyle(st.text, st.style, active, !!st.highlight)).join("");
 }
 
 export function getStyledTextLength(styledText: StyledText) {

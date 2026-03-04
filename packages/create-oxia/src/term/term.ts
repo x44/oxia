@@ -20,7 +20,7 @@ export class Term {
 		readline.emitKeypressEvents(this.in, this.rl);
 		if (this.in.isTTY) this.in.setRawMode(true);
 
-		const keyListener = (s, key) => {
+		const keyListener = (s: string, key: any) => {
 			if (this.in.isTTY) this.in.setRawMode(true);
 
 			if (key.ctrl) {

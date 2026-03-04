@@ -23,7 +23,7 @@ export abstract class TermWidget {
 	protected contentH = 0;
 	protected active = false;
 	protected done = false;
-	protected resolve: (value: WidgetResult | PromiseLike<WidgetResult>) => void;
+	protected resolve!: (value: WidgetResult | PromiseLike<WidgetResult>) => void;
 
 	constructor(term: Term, options: WidgetOptions) {
 		this.out = term.getOut();
@@ -530,7 +530,7 @@ export type Task = {
 
 export class TaskWidget extends TermWidget {
 	private tasks: Task[];
-	private interval;
+	private interval?: NodeJS.Timeout;
 	private spinnerPhase = 0;
 	private renderedTextLines: StyledText[] = [];
 

@@ -41,7 +41,7 @@ type ThemeColors = {
 	borderFgInActive: string | undefined;
 
 	/* Input */
-	inputBgActive: string;
+	inputBgActive: string | undefined;
 	inputBgInActive: string | undefined;
 	inputFgActive: string;
 	inputFgInActive: string;

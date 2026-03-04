@@ -357,7 +357,7 @@ function initProject(settings: Settings, task: Task) {
 
 function copyTemplate(settings: Settings, task: Task) {
 	task.state = "running";
-	if (settings.templateMeta.id === "empty") {
+	if (settings.templateMeta?.id === "empty") {
 		copyEmptyTemplate(settings);
 	} else {
 		copyNamedTemplate(settings);
@@ -424,7 +424,7 @@ async function create(settings: Settings) {
 		state: "pending",
 	};
 	const copyTask: Task = {
-		text: appendStyledText(createStyledText("Copy template ", "normal"), settings.templateMeta.name, "primary"),
+		text: appendStyledText(createStyledText("Copy template ", "normal"), settings.templateMeta!.name, "primary"),
 		state: "pending",
 	};
 	const installDependenciesTask: Task = {
@@ -513,7 +513,6 @@ function killProcess(proc: ChildProcessWithoutNullStreams) {
 	} else {
 		proc.kill(-proc.pid!);
 	}
-	proc = undefined;
 }
 
 export async function main() {

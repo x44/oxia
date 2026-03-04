@@ -4,7 +4,8 @@
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
 		"declaration": false,
-		"outDir": "dist"
+		"outDir": "dist",
+		"strict": true,
 	},
 	"include": [
 		"src"
