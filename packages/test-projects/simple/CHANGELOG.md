@@ -1,5 +1,12 @@
 # @test-projects/simple
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [c6f77fb]
+  - oxia@0.0.14
+
 ## 0.0.12
 
 ### Patch Changes

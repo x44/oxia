@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.14
+
+### Patch Changes
+
+- c6f77fb: Fixed dev server serving all files as utf8
+
 ## 0.0.13
 
 ### Patch Changes
