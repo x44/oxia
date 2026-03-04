@@ -1,5 +1,11 @@
 # create-oxia
 
+## 0.0.12
+
+### Patch Changes
+
+- 518cce4: Strict mode
+
 ## 0.0.11
 
 ### Patch Changes
