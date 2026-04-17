@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.15
+
+### Patch Changes
+
+- b50960e: Fixed tsgo rootDir
+
 ## 0.0.14
 
 ### Patch Changes
