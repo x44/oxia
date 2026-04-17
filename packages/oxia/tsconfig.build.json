@@ -4,6 +4,7 @@
 		"noEmit": false,
 		"removeComments": false,
 		"outDir": "dist",
+		"rootDir": "./src",
 	},
 	"include": [
 		"src",

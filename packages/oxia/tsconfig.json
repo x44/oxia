@@ -15,6 +15,7 @@
 		"moduleResolution": "bundler",
 		"verbatimModuleSyntax": true,
 		"moduleDetection": "force",
+		"skipLibCheck": true,
 		"noEmit": true,
 		"strict": true,
 		// "noUnusedLocals": true,
@@ -23,7 +24,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
 		"jsx": "react",
-		"rootDir": "./src",
+		"rootDir": ".",
 	},
 	"include": [
 		"src",
