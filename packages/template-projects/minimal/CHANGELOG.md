@@ -1,5 +1,12 @@
 # @template-projects/minimal
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [5936149]
+  - oxia@0.0.16
+
 ## 0.0.14
 
 ### Patch Changes
