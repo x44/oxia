@@ -1,5 +1,12 @@
 # @test-projects/global-style
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [5936149]
+  - oxia@0.0.16
+
 ## 0.0.9
 
 ### Patch Changes

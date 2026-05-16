@@ -1,5 +1,11 @@
 # oxia
 
+## 0.0.16
+
+### Patch Changes
+
+- 5936149: Fix dev server reload on static file changes
+
 ## 0.0.15
 
 ### Patch Changes
