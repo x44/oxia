@@ -181,6 +181,10 @@ async function _run(options: ResolvedOptions, changedFiles: string[] | "all", ch
 	if (routeFileBuildResults.length) {
 		const routesToReload = routeFileBuildResults.map(r => r.routeFile.routePath);
 		reloadServer(routesToReload);
+	} else {
+		if (changeType === "static") {
+			reloadServer([]);
+		}
 	}
 
 	const ok = routeFileBuildResults.find(r => !!r.error) === undefined;

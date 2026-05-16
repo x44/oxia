@@ -14,7 +14,7 @@ function __ws__connect(reloadOnOpen) {
 
 	ws.onmessage = (msg) => {
 		const { routes } = payload = JSON.parse(msg.data);
-		if (routes.includes(location.pathname)) {
+		if (routes.length === 0 || routes.includes(location.pathname)) {
 			location.reload();
 		}
 	};
