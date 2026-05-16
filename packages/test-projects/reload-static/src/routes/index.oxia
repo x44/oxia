@@ -1,0 +1,15 @@
+// IMPORT TO MAKE REBUILD WORK
+// NOTE THAT THE SCRIPT MUST CHECK IF globalThis.window is defined
+// IF THE SCRIPT USES window ON THE SCRIPT TOP LEVEL
+import "../scripts/test.js";
+
+export default function index() {
+	return (
+		<img src="/test.webp" />
+		<div id="scriptDiv1"></div>
+		<div id="scriptDiv2"></div>
+		<Script mode="embed" src="./scripts/test.js"></Script>
+
+		<script>scriptTest()</script>
+	)
+}
